@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 6: Error Handling - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Error Handling</h1>
+        <p>Learn to handle errors gracefully in Ruby</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">Exceptions</button>
+                <button class="topic-btn" data-target="topic2">Begin, Rescue, Ensure</button>
+                <button class="topic-btn" data-target="topic3">Custom Exceptions</button>
+                <button class="topic-btn" data-target="topic4">Debugging Techniques</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>Exceptions</h2>
+            
+            <h3>Understanding Exceptions</h3>
+            <p>An exception is an object that represents an error or unexpected condition. When an exception occurs, normal program flow is interrupted.</p>
+            
+            <div class="code-example">
+                <pre># Common exceptions in Ruby
+10 / 0                  # ZeroDivisionError
+undefined_variable      # NameError
+"hello"[10]             # IndexError
+[1, 2, 3].fetch(5)      # IndexError
+{a: 1}[:b]              # nil (not an exception)
+{a: 1}.fetch(:b)        # KeyError
+File.open("nonexistent.txt") # Errno::ENOENT</pre>
+            </div>
+            
+            <h3>Exception Hierarchy</h3>
+            <p>Ruby has a rich hierarchy of exception classes. Here's a simplified version:</p>
+            
+            <div class="code-example">
+                <pre>Exception
+  ├── NoMemoryError
+  ├── ScriptError
+  │     ├── LoadError
+  │     ├── NotImplementedError
+  │     └── SyntaxError
+  └── StandardError
+        ├── ArgumentError
+        ├── IOError
+        │     └── EOFError
+        ├── IndexError
+        │     └── KeyError
+        ├── NameError
+        │     └── NoMethodError
+        ├── RangeError
+        │     └── FloatDomainError
+        ├── RegexpError
+        ├── RuntimeError
+        ├── SystemCallError
+        │     └── Errno::*
+        ├── ThreadError
+        ├── TypeError
+        └── ZeroDivisionError</pre>
+            </div>
+            
+            <h3>Raising Exceptions</h3>
+            <p>You can raise exceptions using the <code>raise</code> method:</p>
+            
+            <div class="code-example">
+                <pre># Raise a RuntimeError with a message
+raise "Something went wrong"
+
+# Raise a specific exception type
+raise ArgumentError, "Invalid argument"
+
+# Raise an exception with a message and backtrace
+raise ArgumentError.new("Invalid argument")
+
+# Re-raising the current exception
+begin
+  # some code
+rescue => e
+  puts "An error occurred: #{e.message}"
+  raise  # Re-raises the same exception
+end</pre>
+            </div>
+            
+            <h3>Exception Properties</h3>
+            <p>Exception objects have useful properties and methods:</p>
+            
+            <div class="code-example">
+                <pre>begin
+  10 / 0
+rescue => e
+  puts "Exception class: #{e.class}"
+  puts "Message: #{e.message}"
+  puts "Backtrace: #{e.backtrace.first(3)}"
+end
+
+# Output:
+# Exception class: ZeroDivisionError
+# Message: divided by 0
+# Backtrace: ["(irb):2:in `/'", ...]</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Exception Explorer</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Intentionally triggers different types of exceptions</li>
+                    <li>Catches each exception and displays its:
+                        <ul>
+                            <li>Class</li>
+                            <li>Message</li>
+                            <li>Backtrace</li>
+                            <li>Parent class</li>
+                        </ul>
+                    </li>
+                    <li>Creates a tree representation of the exception hierarchy for the exceptions you've encountered</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('exception-explorer', event)">Show Solution</button>
+                <div id="exception-explorer" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 6: Mini Project - Exception Explorer
+
+# Define a helper class to analyze exceptions
+class ExceptionAnalyzer
+  # Store information about exceptions we've encountered
+  @@exceptions_info = {}
+  
+  # Return all exception information that's been collected
+  def self.exceptions_info
+    @@exceptions_info
+  end
+  
+  # Analyze an exception and store its details
+  def self.analyze(exception)
+    # Get the exception class
+    exception_class = exception.class
+    
+    # Store information about this exception
+    @@exceptions_info[exception_class] = {
+      name: exception_class.name,
+      message: exception.message,
+      backtrace: exception.backtrace || [],
+      parent: exception_class.superclass
+    }
+    
+    # Print the analysis
+    print_analysis(exception)
+  end
+  
+  # Print detailed information about an exception
+  def self.print_analysis(exception)
+    exception_class = exception.class
+    
+    puts "\n" + "=" * 50
+    puts "EXCEPTION ANALYSIS"
+    puts "=" * 50
+    puts "Class:      #{exception_class}"
+    puts "Message:    #{exception.message}"
+    puts "Parent:     #{exception_class.superclass}"
+    
+    # Print a shortened backtrace (first 3 lines)
+    if exception.backtrace
+      puts "\nBacktrace (first 3 lines):"
+      exception.backtrace[0..2].each_with_index do |line, i|
+        puts "  #{i+1}. #{line}"
+      end
+    else
+      puts "\nBacktrace: None available"
+    end
+    
+    puts "=" * 50
+  end
+  
+  # Generate a hierarchy tree of the exceptions we've encountered
+  def self.print_hierarchy_tree
+    puts "\n" + "=" * 50
+    puts "EXCEPTION HIERARCHY TREE"
+    puts "=" * 50
+    
+    # Find all root exceptions (Exception class or direct subclasses)
+    roots = @@exceptions_info.keys.select do |klass|
+      klass == Exception || klass.superclass == Exception
+    end
+    
+    # Print the tree starting from each root
+    roots.each do |root|
+      print_tree(root)
+    end
+    
+    puts "=" * 50
+  end
+  
+  # Helper method to print a hierarchy tree
+  def self.print_tree(klass, level = 0)
+    # Print the current class with proper indentation
+    indent = "  " * level
+    puts "#{indent}#{klass}"
+    
+    # Find and print all direct children
+    children = @@exceptions_info.keys.select { |k| k.superclass == klass }
+    children.each { |child| print_tree(child, level + 1) }
+  end
+end
+
+# Method to trigger and catch various exceptions
+def trigger_exception(test_case)
+  begin
+    case test_case
+    when :division_by_zero
+      puts "\nTesting division by zero..."
+      result = 10 / 0
+      
+    when :undefined_method
+      puts "\nTesting undefined method..."
+      "hello".this_method_does_not_exist
+      
+    when :no_method_error
+      puts "\nTesting NoMethodError..."
+      nil.length
+      
+    when :name_error
+      puts "\nTesting NameError..."
+      undefined_variable
+      
+    when :argument_error
+      puts "\nTesting ArgumentError..."
+      Array.new(-1)
+      
+    when :type_error
+      puts "\nTesting TypeError..."
+      "string" + :symbol
+      
+    when :index_error
+      puts "\nTesting IndexError..."
+      [][5]
+      
+    when :key_error
+      puts "\nTesting KeyError..."
+      {}.fetch(:missing_key)
+      
+    when :io_error
+      puts "\nTesting IOError..."
+      File.open("nonexistent_file.txt", "r")
+      
+    when :syntax_error
+      puts "\nTesting SyntaxError..."
+      eval("1 + * 3")
+      
+    when :custom_error
+      puts "\nTesting a custom exception..."
+      class MyCustomError < StandardError; end
+      raise MyCustomError, "This is a custom error message"
+      
+    else
+      puts "Unknown test case: #{test_case}"
+    end
+    
+  rescue => e
+    # Analyze the caught exception
+    ExceptionAnalyzer.analyze(e)
+  end
+end
+
+# Main program
+puts "RUBY EXCEPTION EXPLORER"
+puts "======================"
+
+# List of exceptions to trigger
+exception_types = [
+  :division_by_zero,
+  :undefined_method,
+  :no_method_error,
+  :name_error,
+  :argument_error,
+  :type_error,
+  :index_error,
+  :key_error, 
+  :io_error,
+  :syntax_error,
+  :custom_error
+]
+
+# Trigger and analyze each exception
+exception_types.each do |type|
+  trigger_exception(type)
+  sleep(0.2)  # Brief pause between exceptions for readability
+end
+
+# Print a hierarchy tree of all exceptions we've encountered
+ExceptionAnalyzer.print_hierarchy_tree
+
+puts "\nTotal unique exceptions encountered: #{ExceptionAnalyzer.exceptions_info.size}"
+
+# Example output of running this program:
+=begin
+RUBY EXCEPTION EXPLORER
+======================
+
+Testing division by zero...
+
+==================================================
+EXCEPTION ANALYSIS
+==================================================
+Class:      ZeroDivisionError
+Message:    divided by 0
+Parent:     StandardError
+
+Backtrace (first 3 lines):
+  1. exception_explorer.rb:89:in `/'
+  2. exception_explorer.rb:89:in `trigger_exception'
+  3. exception_explorer.rb:165:in `block in <main>'
+==================================================
+
+Testing undefined method...
+
+==================================================
+EXCEPTION ANALYSIS
+==================================================
+Class:      NoMethodError
+Message:    undefined method `this_method_does_not_exist' for "hello":String
+Parent:     NameError
+
+Backtrace (first 3 lines):
+  1. exception_explorer.rb:93:in `trigger_exception'
+  2. exception_explorer.rb:165:in `block in <main>'
+  3. exception_explorer.rb:163:in `each'
+==================================================
+
+... (more exception analyses) ...
+
+==================================================
+EXCEPTION HIERARCHY TREE
+==================================================
+Exception
+  StandardError
+    ZeroDivisionError
+    ArgumentError
+    TypeError
+    NameError
+      NoMethodError
+    IndexError
+    KeyError
+    IOError
+    SyntaxError
+    MyCustomError
+==================================================
+
+Total unique exceptions encountered: 11
+=end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Begin, Rescue, Ensure →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Begin, Rescue, Ensure</h2>
+            
+            <h3>Basic Exception Handling</h3>
+            <p>Ruby provides a structured way to handle exceptions using <code>begin</code>/<code>rescue</code> blocks:</p>
+            
+            <div class="code-example">
+                <pre>begin
+  # Code that might raise an exception
+  result = 10 / 0
+rescue
+  # Code to handle the exception
+  puts "An error occurred!"
+  result = nil
+end
+
+puts "Result: #{result}"
+# Output:
+# An error occurred!
+# Result: </pre>
+            </div>
+            
+            <h3>Catching Specific Exceptions</h3>
+            <p>You can catch specific types of exceptions:</p>
+            
+            <div class="code-example">
+                <pre>begin
+  # This could raise different types of exceptions
+  num = Integer(gets.chomp)
+  result = 100 / num
+rescue ZeroDivisionError
+  puts "Cannot divide by zero!"
+  result = nil
+rescue ArgumentError
+  puts "That's not a valid number!"
+  result = nil
+end</pre>
+            </div>
+            
+            <h3>Capturing the Exception Object</h3>
+            <p>You can capture the exception object for inspection:</p>
+            
+            <div class="code-example">
+                <pre>begin
+  # Some risky code
+  File.open("nonexistent.txt")
+rescue => e  # Capture the exception in variable e
+  puts "Error: #{e.message}"
+  puts "Error type: #{e.class}"
+end</pre>
+            </div>
+            
+            <h3>Multiple Rescue Clauses</h3>
+            <p>You can have multiple rescue clauses to handle different types of exceptions:</p>
+            
+            <div class="code-example">
+                <pre>begin
+  # Some risky code
+  file = File.open("data.txt")
+  content = file.read
+rescue Errno::ENOENT => e
+  puts "Error: File not found (#{e.message})"
+rescue Errno::EACCES => e
+  puts "Error: Permission denied (#{e.message})"
+rescue => e
+  puts "Error: #{e.message}"
+ensure
+  file.close if file
+end</pre>
+            </div>
+            
+            <h3>The else Clause</h3>
+            <p>The <code>else</code> clause is executed if no exceptions are raised:</p>
+            
+            <div class="code-example">
+                <pre>begin
+  puts "Dividing 10 by 2"
+  result = 10 / 2
+rescue ZeroDivisionError
+  puts "Division by zero error!"
+else
+  puts "The division was successful!"
+  puts "The result is #{result}"
+end
+
+# Output:
+# Dividing 10 by 2
+# The division was successful!
+# The result is 5</pre>
+            </div>
+            
+            <h3>The ensure Clause</h3>
+            <p>The <code>ensure</code> clause is always executed, whether an exception was raised or not:</p>
+            
+            <div class="code-example">
+                <pre>begin
+  file = File.open("sample.txt")
+  # Process the file
+rescue => e
+  puts "Error processing file: #{e.message}"
+else
+  puts "File processed successfully!"
+ensure
+  # This code always runs
+  file.close if file
+  puts "File handling completed"
+end</pre>
+            </div>
+            
+            <h3>Retry Statement</h3>
+            <p>The <code>retry</code> statement reruns the begin block from the beginning:</p>
+            
+            <div class="code-example">
+                <pre>attempts = 0
+
+begin
+  attempts += 1
+  puts "Attempt #{attempts}"
+  
+  # This will raise an exception on the first try
+  if attempts == 1
+    raise "First attempt failed!"
+  end
+  
+  puts "Success!"
+rescue => e
+  puts "Error: #{e.message}"
+  retry if attempts < 3
+  puts "Giving up after #{attempts} attempts"
+end</pre>
+            </div>
+            
+            <h3>Rescue Modifier</h3>
+            <p>For simple cases, you can use the rescue modifier on a single line:</p>
+            
+            <div class="code-example">
+                <pre># Attempt to convert to integer, return 0 if it fails
+number = Integer(gets.chomp) rescue 0
+
+# Try to read a file, return empty string if it fails
+content = File.read("data.txt") rescue ""</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Robust File Processor</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Asks the user for a filename</li>
+                    <li>Attempts to open and read the file</li>
+                    <li>Handles different potential errors:
+                        <ul>
+                            <li>File not found</li>
+                            <li>Permission denied</li>
+                            <li>File is a directory</li>
+                            <li>Other I/O errors</li>
+                        </ul>
+                    </li>
+                    <li>Uses retry to allow the user to enter a different filename if an error occurs</li>
+                    <li>Limits the number of retry attempts</li>
+                    <li>Always cleans up resources properly</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('robust-file-processor', event)">Show Solution</button>
+                <div id="robust-file-processor" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 6: Mini Project - Robust File Processor
+
+# Constants
+MAX_RETRY_ATTEMPTS = 3
+
+# Function to process a file
+def process_file(filename)
+  puts "Processing file: #{filename}"
+  
+  # Process file content based on extension
+  extension = File.extname(filename).downcase
+  
+  case extension
+  when ".txt", ".text"
+    puts "Processing as a text file"
+    count_words(file_content)
+  when ".csv"
+    puts "Processing as a CSV file"
+    puts "CSV content has #{file_content.lines.count} rows"
+  when ".json"
+    puts "Processing as a JSON file"
+    puts "JSON file detected (parsing would require JSON library)"
+  else
+    puts "Unknown file type, processing as plain text"
+    puts "Content length: #{file_content.length} characters"
+  end
+end
+
+# Function to count words in a text
+def count_words(text)
+  word_count = text.split.size
+  puts "Word count: #{word_count}"
+  
+  # Count frequency of each word
+  word_frequency = {}
+  text.downcase.scan(/\w+/) do |word|
+    word_frequency[word] ||= 0
+    word_frequency[word] += 1
+  end
+  
+  # Display the 5 most common words
+  puts "Top 5 most frequent words:"
+  word_frequency.sort_by { |_word, count| -count }[0...5].each do |word, count|
+    puts "  #{word}: #{count} times"
+  end
+end
+
+# Main program
+puts "=== ROBUST FILE PROCESSOR ==="
+puts "This program reads and processes text files with proper error handling."
+
+attempts = 0
+file_content = nil
+file = nil
+
+begin
+  # Limit retry attempts
+  if attempts >= MAX_RETRY_ATTEMPTS
+    puts "Maximum retry attempts (#{MAX_RETRY_ATTEMPTS}) reached. Exiting."
+    exit
+  end
+  
+  # Increment attempts counter
+  attempts += 1
+  
+  # Ask user for a filename
+  print "\nEnter filename to process (attempt #{attempts}/#{MAX_RETRY_ATTEMPTS}): "
+  filename = gets.chomp
+  
+  # Exit if user enters nothing
+  if filename.empty?
+    puts "No filename entered. Exiting."
+    exit
+  end
+  
+  begin
+    # Try to open the file
+    file = File.open(filename, "r")
+    
+    # Read the entire file content
+    file_content = file.read
+    
+    # Process the file
+    puts "\nSuccessfully opened file: #{filename}"
+    puts "File size: #{file_content.length} bytes"
+    
+    # Process file content
+    process_file(filename)
+    
+  rescue Errno::ENOENT => e
+    # File not found error
+    puts "\nERROR: File not found - #{e.message}"
+    puts "Please check that the file exists and try again."
+    retry
+    
+  rescue Errno::EACCES => e
+    # Permission denied error
+    puts "\nERROR: Permission denied - #{e.message}"
+    puts "Please check file permissions and try again."
+    retry
+    
+  rescue Errno::EISDIR => e
+    # Is a directory error
+    puts "\nERROR: Not a file but a directory - #{e.message}"
+    puts "Please enter a valid file path, not a directory."
+    retry
+    
+  rescue IOError => e
+    # Generic IO error
+    puts "\nERROR: IO error - #{e.message}"
+    retry
+    
+  rescue SystemCallError => e
+    # Other system errors
+    puts "\nERROR: System error - #{e.message}"
+    retry
+    
+  rescue Exception => e
+    # Catch-all for any other errors
+    puts "\nERROR: Unexpected error - #{e.message}"
+    puts "Error class: #{e.class}"
+    retry
+    
+  ensure
+    # Always close the file if it was opened
+    if file
+      puts "\nCleaning up resources..."
+      file.close
+      puts "File closed."
+    end
+  end
+  
+  # If we get here, we've successfully processed the file
+  puts "\nFile processing completed successfully."
+  
+ rescue Exception => e
+  # Catch any errors that might occur in the outer block
+  puts "\nA critical error occurred: #{e.message}"
+  puts "The program will now exit."
+end
+
+# Sample execution:
+#
+# === ROBUST FILE PROCESSOR ===
+# This program reads and processes text files with proper error handling.
+#
+# Enter filename to process (attempt 1/3): nonexistent.txt
+#
+# ERROR: File not found - No such file or directory @ rb_sysopen - nonexistent.txt
+# Please check that the file exists and try again.
+#
+# Enter filename to process (attempt 2/3): /etc/passwd
+#
+# ERROR: Permission denied - Permission denied @ rb_sysopen - /etc/passwd
+# Please check file permissions and try again.
+#
+# Enter filename to process (attempt 3/3): sample.txt
+#
+# Successfully opened file: sample.txt
+# File size: 152 bytes
+# Processing file: sample.txt
+# Processing as a text file
+# Word count: 23
+# Top 5 most frequent words:
+#   the: 3 times
+#   file: 2 times
+#   this: 2 times
+#   is: 2 times
+#   a: 2 times
+#
+# Cleaning up resources...
+# File closed.
+#
+# File processing completed successfully.</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Exceptions</button>
+                <button class="btn next-btn">Next: Custom Exceptions →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Custom Exceptions</h2>
+            
+            <h3>Creating Custom Exception Classes</h3>
+            <p>You can create your own exception classes by inheriting from StandardError or any of its subclasses:</p>
+            
+            <div class="code-example">
+                <pre>class ValidationError < StandardError
+end
+
+class NotAuthenticatedError < StandardError
+end
+
+class InsufficientFundsError < StandardError
+  attr_reader :account, :amount_requested
+  
+  def initialize(account, amount_requested)
+    @account = account
+    @amount_requested = amount_requested
+    super("Insufficient funds: account #{account.id} has #{account.balance} but #{amount_requested} was requested")
+  end
+end</pre>
+            </div>
+            
+            <h3>Using Custom Exceptions</h3>
+            <p>Custom exceptions make your code more readable and help with specific error handling:</p>
+            
+            <div class="code-example">
+                <pre>class BankAccount
+  attr_reader :id, :balance
+  
+  def initialize(id, initial_balance = 0)
+    @id = id
+    @balance = initial_balance
+  end
+  
+  def deposit(amount)
+    if amount <= 0
+      raise ValidationError, "Deposit amount must be positive"
+    end
+    
+    @balance += amount
+  end
+  
+  def withdraw(amount)
+    if amount <= 0
+      raise ValidationError, "Withdrawal amount must be positive"
+    end
+    
+    if amount > @balance
+      raise InsufficientFundsError.new(self, amount)
+    end
+    
+    @balance -= amount
+  end
+end
+
+account = BankAccount.new(123, 500)
+
+begin
+  account.withdraw(1000)
+rescue ValidationError => e
+  puts "Validation error: #{e.message}"
+rescue InsufficientFundsError => e
+  puts "Funds error: #{e.message}"
+  puts "Account balance: #{e.account.balance}"
+  puts "Requested amount: #{e.amount_requested}"
+end</pre>
+            </div>
+            
+            <h3>When to Create Custom Exceptions</h3>
+            <p>Create custom exceptions when:</p>
+            <ul>
+                <li>You need to handle specific error conditions differently</li>
+                <li>You want to provide additional context about the error</li>
+                <li>The built-in exceptions don't adequately describe the error</li>
+                <li>You're creating a library or API used by others</li>
+            </ul>
+            
+            <h3>Exception Best Practices</h3>
+            
+            <div class="code-example">
+                <pre># 1. Always inherit from StandardError, not Exception
+class MyError < StandardError; end  # Good
+class MyError < Exception; end     # Bad (too broad)
+
+# 2. Provide meaningful error messages
+raise ValidationError, "Username cannot be empty"  # Good
+raise ValidationError  # Bad (no context)
+
+# 3. Only rescue specific exceptions
+begin
+  # some code
+rescue StandardError => e  # Good (catches only StandardError and subclasses)
+  # handle error
+end
+
+begin
+  # some code
+rescue => e  # Still OK (implicitly rescues StandardError)
+  # handle error
+end
+
+begin
+  # some code
+rescue Exception => e  # Bad (catches ALL exceptions, including SyntaxError, SignalException)
+  # handle error
+end</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Online Shopping System</h4>
+                <p>Create a Ruby program that simulates an online shopping system with:</p>
+                <ol>
+                    <li>A hierarchy of custom exceptions:
+                        <ul>
+                            <li><code>ShoppingError</code> - base class for all shopping exceptions</li>
+                            <li><code>InventoryError</code> - for inventory-related issues</li>
+                            <li><code>PaymentError</code> - for payment-related issues</li>
+                            <li>More specific subclasses as needed</li>
+                        </ul>
+                    </li>
+                    <li>Classes for <code>Product</code>, <code>Inventory</code>, <code>ShoppingCart</code>, and <code>PaymentProcessor</code></li>
+                    <li>Methods that raise appropriate exceptions in error conditions</li>
+                    <li>A main shopping flow that handles different exceptions appropriately</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('online-shopping', event)">Show Solution</button>
+                <div id="online-shopping" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 6: Mini Project - Online Shopping System
+
+#================================================
+# CUSTOM EXCEPTIONS HIERARCHY
+#================================================
+
+# Base exception for all shopping-related errors
+class ShoppingError < StandardError
+  def initialize(msg="A shopping error occurred")
+    super
+  end
+end
+
+# Inventory-related exceptions
+class InventoryError < ShoppingError
+  def initialize(msg="An inventory error occurred")
+    super
+  end
+end
+
+class OutOfStockError < InventoryError
+  def initialize(product_name)
+    super("Product '#{product_name}' is out of stock")
+  end
+end
+
+class ProductNotFoundError < InventoryError
+  def initialize(product_id)
+    super("Product with ID #{product_id} not found in inventory")
+  end
+end
+
+# Payment-related exceptions
+class PaymentError < ShoppingError
+  def initialize(msg="A payment error occurred")
+    super
+  end
+end
+
+class InsufficientFundsError < PaymentError
+  def initialize(available, required)
+    super("Insufficient funds: $#{available} available, $#{required} required")
+  end
+end
+
+class PaymentDeclinedError < PaymentError
+  def initialize(reason="Unknown reason")
+    super("Payment was declined: #{reason}")
+  end
+end
+
+class InvalidCreditCardError < PaymentError
+  def initialize
+    super("Invalid credit card information")
+  end
+end
+
+# Cart-related exceptions
+class CartError < ShoppingError
+  def initialize(msg="A shopping cart error occurred")
+    super
+  end
+end
+
+class EmptyCartError < CartError
+  def initialize
+    super("Cannot checkout with an empty cart")
+  end
+end
+
+#================================================
+# PRODUCT CLASS
+#================================================
+
+class Product
+  attr_reader :id, :name, :price, :category
+  
+  def initialize(id, name, price, category)
+    @id = id
+    @name = name
+    @price = price
+    @category = category
+  end
+  
+  def to_s
+    "#{@name} ($#{@price})"
+  end
+end
+
+#================================================
+# INVENTORY CLASS
+#================================================
+
+class Inventory
+  def initialize
+    # Hash mapping product_id => [product_object, quantity]
+    @products = {}
+  end
+  
+  # Add a product to the inventory
+  def add_product(product, quantity)
+    if @products[product.id]
+      @products[product.id][1] += quantity
+    else
+      @products[product.id] = [product, quantity]
+    end
+    puts "Added #{quantity} x #{product.name} to inventory"
+  end
+  
+  # Check if a product is in stock
+  def in_stock?(product_id, quantity=1)
+    return false unless @products[product_id]
+    @products[product_id][1] >= quantity
+  end
+  
+  # Get a product by its ID
+  def get_product(product_id)
+    if @products[product_id]
+      @products[product_id][0]
+    else
+      raise ProductNotFoundError.new(product_id)
+    end
+  end
+  
+  # Remove a product from inventory (when purchased)
+  def remove_product(product_id, quantity=1)
+    unless @products[product_id]
+      raise ProductNotFoundError.new(product_id)
+    end
+    
+    if @products[product_id][1] < quantity
+      product_name = @products[product_id][0].name
+      raise OutOfStockError.new(product_name)
+    end
+    
+    @products[product_id][1] -= quantity
+    @products[product_id][0]  # Return the product
+  end
+  
+  # Display the current inventory
+  def display
+    puts "\n===== CURRENT INVENTORY ====="
+    if @products.empty?
+      puts "Inventory is empty"
+    else
+      @products.each do |id, (product, quantity)|
+        puts "ID: #{id} | #{product} | Quantity: #{quantity}"
+      end
+    end
+    puts "===========================\n"
+  end
+end
+
+#================================================
+# SHOPPING CART CLASS
+#================================================
+
+class ShoppingCart
+  def initialize(inventory)
+    @inventory = inventory
+    @items = {}  # product_id => quantity
+  end
+  
+  # Add a product to the cart
+  def add_item(product_id, quantity=1)
+    # Check if product exists and is in stock
+    unless @inventory.in_stock?(product_id, quantity)
+      begin
+        product = @inventory.get_product(product_id)
+        raise OutOfStockError.new(product.name)
+      rescue ProductNotFoundError => e
+        raise e
+      end
+    end
+    
+    # Add to cart
+    if @items[product_id]
+      @items[product_id] += quantity
+    else
+      @items[product_id] = quantity
+    end
+    
+    product = @inventory.get_product(product_id)
+    puts "Added #{quantity} x #{product.name} to cart"
+  end
+  
+  # Remove an item from the cart
+  def remove_item(product_id, quantity=1)
+    unless @items[product_id]
+      product = @inventory.get_product(product_id)  # This might raise ProductNotFoundError
+      raise CartError.new("Product '#{product.name}' is not in your cart")
+    end
+    
+    if quantity >= @items[product_id]
+      @items.delete(product_id)
+    else
+      @items[product_id] -= quantity
+    end
+    
+    product = @inventory.get_product(product_id)
+    puts "Removed #{quantity} x #{product.name} from cart"
+  end
+  
+  # Calculate the total price of items in the cart
+  def total
+    total = 0
+    @items.each do |product_id, quantity|
+      product = @inventory.get_product(product_id)
+      total += product.price * quantity
+    end
+    total
+  end
+  
+  # Check if the cart is empty
+  def empty?
+    @items.empty?
+  end
+  
+  # Display the cart contents
+  def display
+    puts "\n===== YOUR SHOPPING CART ====="
+    if empty?
+      puts "Your cart is empty"
+    else
+      @items.each do |product_id, quantity|
+        product = @inventory.get_product(product_id)
+        puts "#{quantity} x #{product} = $#{product.price * quantity}"
+      end
+      puts "-----------------------------"
+      puts "Total: $#{total}"
+    end
+    puts "=============================\n"
+  end
+  
+  # Get the items in the cart (for checkout)
+  def items
+    @items
+  end
+  
+  # Clear the cart after checkout
+  def clear
+    @items = {}
+  end
+end
+
+#================================================
+# PAYMENT PROCESSOR CLASS
+#================================================
+
+class PaymentProcessor
+  # Process a payment (simulated)
+  def process_payment(amount, payment_method, card_details=nil)
+    puts "Processing payment of $#{amount}..."
+    
+    # Simulate various payment errors
+    case payment_method
+    when :credit_card
+      unless card_details
+        raise InvalidCreditCardError.new
+      end
+      
+      # Simulate a declined card
+      if card_details[:number].to_s.end_with?('0000')
+        raise PaymentDeclinedError.new("Card ending in 0000 always declined for demo")
+      end
+      
+      # Card validation would go here
+      if card_details[:number].to_s.length != 16
+        raise InvalidCreditCardError.new
+      end
+      
+    when :account_balance
+      balance = card_details[:balance]
+      if balance < amount
+        raise InsufficientFundsError.new(balance, amount)
+      end
+    else
+      raise PaymentError.new("Unsupported payment method: #{payment_method}")
+    end
+    
+    # If we get here, payment was successful
+    puts "Payment successful!"
+    true
+  end
+end
+
+#================================================
+# MAIN SHOPPING WORKFLOW
+#================================================
+
+def run_shopping_demo
+  puts "===== ONLINE SHOPPING SYSTEM DEMO ====="
+  
+  # Set up inventory
+  inventory = Inventory.new
+  
+  # Create some products
+  products = [
+    Product.new(1, "Laptop", 999.99, "Electronics"),
+    Product.new(2, "Headphones", 149.99, "Electronics"),
+    Product.new(3, "Coffee Mug", 12.99, "Home"),
+    Product.new(4, "T-Shirt", 24.99, "Clothing"),
+    Product.new(5, "Book", 19.99, "Books")
+  ]
+  
+  # Add products to inventory
+  inventory.add_product(products[0], 5)   # 5 laptops
+  inventory.add_product(products[1], 10)  # 10 headphones
+  inventory.add_product(products[2], 20)  # 20 coffee mugs
+  inventory.add_product(products[3], 15)  # 15 t-shirts
+  inventory.add_product(products[4], 25)  # 25 books
+  
+  # Display initial inventory
+  inventory.display
+  
+  # Create a shopping cart
+  cart = ShoppingCart.new(inventory)
+  
+  # Create payment processor
+  payment = PaymentProcessor.new
+  
+  # Main shopping flow with exception handling
+  begin
+    # Scenario 1: Successfully add items to cart
+    puts "\n--- Scenario 1: Adding items to cart ---"
+    cart.add_item(1, 1)  # Add 1 laptop
+    cart.add_item(2, 2)  # Add 2 headphones
+    cart.add_item(3, 1)  # Add 1 coffee mug
+    cart.display
+    
+    # Scenario 2: Try to add a non-existent product
+    puts "\n--- Scenario 2: Adding non-existent product ---"
+    begin
+      cart.add_item(10, 1)  # Product ID 10 doesn't exist
+    rescue ProductNotFoundError => e
+      puts "Error caught: #{e.message}"
+      puts "Continuing shopping..."
+    end
+    
+    # Scenario 3: Try to add more products than in stock
+    puts "\n--- Scenario 3: Adding more products than available ---"
+    begin
+      cart.add_item(1, 10)  # Only 5 laptops in stock, already have 1 in cart
+    rescue OutOfStockError => e
+      puts "Error caught: #{e.message}"
+      puts "Continuing shopping..."
+    end
+    
+    # Scenario 4: Successful checkout with credit card
+    puts "\n--- Scenario 4: Successful checkout with credit card ---"
+    if cart.empty?
+      raise EmptyCartError.new
+    end
+    
+    total_amount = cart.total
+    puts "Ready to checkout. Total amount: $#{total_amount}"
+    
+    # Credit card details (in a real app, this would be collected securely)
+    card_details = {
+      number: "4111111111111111",
+      expiry: "12/25",
+      cvv: "123"
+    }
+    
+    # Process payment
+    if payment.process_payment(total_amount, :credit_card, card_details)
+      puts "Order confirmed!"
+      
+      # Update inventory
+      cart.items.each do |product_id, quantity|
+        inventory.remove_product(product_id, quantity)
+      end
+      
+      # Clear the cart
+      cart.clear
+      puts "Cart has been cleared"
+    end
+    
+    # Display updated inventory
+    inventory.display
+    
+    # Scenario 5: Checkout with invalid credit card
+    puts "\n--- Scenario 5: Checkout with invalid credit card ---"
+    cart.add_item(4, 2)  # Add 2 t-shirts
+    cart.display
+    
+    invalid_card = {
+      number: "123",  # Invalid card number (too short)
+      expiry: "12/25",
+      cvv: "123"
+    }
+    
+    begin
+      payment.process_payment(cart.total, :credit_card, invalid_card)
+    rescue InvalidCreditCardError => e
+      puts "Error caught: #{e.message}"
+      puts "Please use a different payment method"
+    end
+    
+    # Scenario 6: Checkout with declined credit card
+    puts "\n--- Scenario 6: Checkout with declined credit card ---"
+    declined_card = {
+      number: "4111111111110000",  # Card ending in 0000 always declined
+      expiry: "12/25",
+      cvv: "123"
+    }
+    
+    begin
+      payment.process_payment(cart.total, :credit_card, declined_card)
+    rescue PaymentDeclinedError => e
+      puts "Error caught: #{e.message}"
+      puts "Please try a different card"
+    end
+    
+    # Scenario 7: Checkout with insufficient funds
+    puts "\n--- Scenario 7: Checkout with insufficient funds ---"
+    begin
+      # Using account balance with insufficient funds
+      account = { balance: 10.00 }  # Only $10 available
+      payment.process_payment(cart.total, :account_balance, account)
+    rescue InsufficientFundsError => e
+      puts "Error caught: #{e.message}"
+    end
+    
+    # Final successful checkout
+    puts "\n--- Final Checkout ---"
+    puts "Using a different credit card..."
+    
+    valid_card = {
+      number: "5555555555554444",
+      expiry: "12/25",
+      cvv: "123"
+    }
+    
+    if payment.process_payment(cart.total, :credit_card, valid_card)
+      puts "Order confirmed!"
+      
+      # Update inventory
+      cart.items.each do |product_id, quantity|
+        inventory.remove_product(product_id, quantity)
+      end
+      
+      # Clear the cart
+      cart.clear
+    end
+    
+    # Show final inventory
+    inventory.display
+    puts "Shopping demo completed successfully!"
+    
+  rescue ShoppingError => e
+    puts "A shopping error occurred: #{e.message}"
+    puts "Error type: #{e.class}"
+  rescue StandardError => e
+    puts "An unexpected error occurred: #{e.message}"
+    puts "Error type: #{e.class}"
+  end
+end
+
+# Run the demo
+run_shopping_demo</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Begin, Rescue, Ensure</button>
+                <button class="btn next-btn">Next: Debugging Techniques →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Debugging Techniques</h2>
+            
+            <h3>Print Debugging</h3>
+            <p>The simplest form of debugging is to use print statements:</p>
+            
+            <div class="code-example">
+                <pre>def complex_calculation(a, b)
+  puts "Starting calculation with a=#{a}, b=#{b}"
+  
+  result = a * b
+  puts "After multiplication: #{result}"
+  
+  result = result / (a - b)
+  puts "After division: #{result}"
+  
+  result
+end
+
+begin
+  result = complex_calculation(5, 5)
+  puts "Final result: #{result}"
+rescue => e
+  puts "Error occurred: #{e.class} - #{e.message}"
+end
+
+# Output:
+# Starting calculation with a=5, b=5
+# After multiplication: 25
+# Error occurred: ZeroDivisionError - divided by 0</pre>
+            </div>
+            
+            <h3>Using the debugger (pry or byebug)</h3>
+            <p>Ruby has several debugging gems that provide interactive debugging:</p>
+            
+            <div class="code-example">
+                <pre># First, install the gem
+# gem install pry-byebug
+
+require 'pry-byebug'
+
+def complex_calculation(a, b)
+  c = a * b
+  binding.pry  # Execution stops here, interactive debugger starts
+  result = c / (a - b)
+  result
+end
+
+complex_calculation(5, 5)
+
+# In the debugger, you can:
+# - Type 'next' or 'n' to execute the next line
+# - Type 'step' or 's' to step into a method
+# - Type 'continue' or 'c' to continue execution
+# - Type 'exit' to exit the debugger
+# - Examine variables by typing their names
+# - Execute arbitrary Ruby code</pre>
+            </div>
+            
+            <h3>Using p and pp</h3>
+            <p>The <code>p</code> method displays the raw representation of objects, and <code>pp</code> (pretty print) formats complex objects for better readability:</p>
+            
+            <div class="code-example">
+                <pre>require 'pp'
+
+data = {
+  users: [
+    { id: 1, name: "Alice", roles: ["admin", "user"] },
+    { id: 2, name: "Bob", roles: ["user"] }
+  ],
+  settings: {
+    theme: "dark",
+    notifications: true
+  }
+}
+
+puts "Using puts:"
+puts data
+
+puts "\nUsing p:"
+p data
+
+puts "\nUsing pp:"
+pp data</pre>
+            </div>
+            
+            <h3>Tracing Execution</h3>
+            <p>Ruby provides a way to trace program execution:</p>
+            
+            <div class="code-example">
+                <pre>def factorial(n)
+  if n <= 1
+    1
+  else
+    n * factorial(n-1)
+  end
+end
+
+# Enable tracing
+set_trace_func proc { |event, file, line, id, binding, classname|
+  printf "%8s %s:%-2d %10s %8s\n", event, file, line, id, classname
+}
+
+factorial(3)
+
+# Disable tracing
+set_trace_func nil</pre>
+            </div>
+            
+            <h3>Logging</h3>
+            <p>For more complex applications, use Ruby's Logger class:</p>
+            
+            <div class="code-example">
+                <pre>require 'logger'
+
+# Create a logger that writes to a file
+logger = Logger.new('application.log')
+
+# Set the log level
+logger.level = Logger::INFO
+
+# Add different types of messages
+logger.debug("Debug information")
+logger.info("Information message")
+logger.warn("Warning message")
+logger.error("Error message")
+logger.fatal("Fatal error message")
+
+# Log with blocks (only evaluated if the log level is enabled)
+logger.debug { "Expensive debug operation: #{calculate_something_expensive()}" }
+
+# Add context to log messages
+logger.info("User login") { "User: admin, IP: 192.168.1.1" }</pre>
+            </div>
+            
+            <h3>Error Reporting in Production</h3>
+            <p>In production environments, you'll want to capture and report errors:</p>
+            
+            <div class="code-example">
+                <pre># Example using a hypothetical error reporting service
+require 'error_reporter'
+
+ErrorReporter.configure do |config|
+  config.api_key = 'your_api_key'
+  config.environment = 'production'
+end
+
+begin
+  # Application code
+  result = some_risky_operation()
+rescue => e
+  # Report the error
+  ErrorReporter.report(e)
+  
+  # Show a user-friendly message
+  puts "Sorry, something went wrong. Our team has been notified."
+end</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Debugging Toolkit</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Defines a <code>Debugger</code> module with methods for:
+                        <ul>
+                            <li>Printing variable values with context</li>
+                            <li>Timing code execution</li>
+                            <li>Tracking method calls</li>
+                            <li>Logging to different outputs (console, file)</li>
+                        </ul>
+                    </li>
+                    <li>Implements a <code>with_debug</code> method that runs a block with debugging enabled</li>
+                    <li>Demonstrates the toolkit on a sample program with bugs</li>
+                </ol>
+                <p>Bonus: Add the ability to toggle different debugging features on and off.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('debugging-toolkit', event)">Show Solution</button>
+                <div id="debugging-toolkit" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 6: Mini Project - Debugging Toolkit
+
+module Debugger
+  # Class variables to store configuration
+  @@enabled = false
+  @@log_file = nil
+  @@features = {
+    timing: true,
+    variable_inspection: true,
+    method_tracking: true,
+    call_stack: false
+  }
+  @@call_depth = 0
+  @@start_time = nil
+  @@tracked_methods = {}
+  
+  # Initialize the debugger
+  def self.init(options = {})
+    @@enabled = options[:enabled] || true
+    
+    if options[:log_file]
+      @@log_file = File.open(options[:log_file], "w")
+    end
+    
+    # Override default feature settings if provided
+    options[:features]&.each do |feature, value|
+      if @@features.has_key?(feature)
+        @@features[feature] = value
+      end
+    end
+    
+    log("Debugger initialized with options: #{options}")
+    log("Enabled features: #{enabled_features.join(', ')}")
+    @@start_time = Time.now
+  end
+  
+  # Clean up resources
+  def self.shutdown
+    if @@log_file
+      @@log_file.close
+      @@log_file = nil
+    end
+    log("Debugger shutdown. Total execution time: #{elapsed_time} seconds")
+  end
+  
+  # Get list of enabled features
+  def self.enabled_features
+    @@features.select { |_, enabled| enabled }.keys
+  end
+  
+  # Toggle a specific feature on or off
+  def self.toggle_feature(feature, value = nil)
+    if @@features.has_key?(feature)
+      @@features[feature] = value.nil? ? !@@features[feature] : value
+      log("Feature '#{feature}' set to #{@@features[feature]}")
+    else
+      log("Unknown feature: #{feature}")
+    end
+  end
+  
+  # Enable or disable the debugger
+  def self.enabled=(value)
+    @@enabled = value
+    log("Debugger #{@@enabled ? 'enabled' : 'disabled'}")
+  end
+  
+  # Check if the debugger is enabled
+  def self.enabled?
+    @@enabled
+  end
+  
+  # Calculate elapsed time since debugger start
+  def self.elapsed_time
+    Time.now - @@start_time if @@start_time
+  end
+  
+  # Print a debug message with timestamp
+  def self.log(message, level = :info)
+    return unless @@enabled
+    
+    timestamp = Time.now.strftime("%Y-%m-%d %H:%M:%S.%L")
+    formatted_message = "[#{timestamp}] [#{level.upcase}] #{message}"
+    
+    # Log to console
+    puts formatted_message
+    
+    # Log to file if configured
+    if @@log_file
+      @@log_file.puts(formatted_message)
+      @@log_file.flush
+    end
+  end
+  
+  # Log an error message
+  def self.error(message)
+    log(message, :error)
+  end
+  
+  # Log a warning message
+  def self.warning(message)
+    log(message, :warning)
+  end
+  
+  # Inspect and log variable values with context
+  def self.inspect_variables(variables, context = "")
+    return unless @@enabled && @@features[:variable_inspection]
+    
+    log("Variable inspection#{context.empty? ? '' : ' in ' + context}:")
+    variables.each do |name, value|
+      log("  #{name} (#{value.class}): #{value.inspect}")
+    end
+  end
+  
+  # Time a block of code
+  def self.time_block(label)
+    return yield unless @@enabled && @@features[:timing]
+    
+    start_time = Time.now
+    result = yield
+    end_time = Time.now
+    duration = end_time - start_time
+    
+    log("Time for '#{label}': #{duration.round(6)} seconds")
+    result
+  end
+  
+  # Track method calls
+  def self.track_method(klass, method_name)
+    return unless @@enabled && @@features[:method_tracking]
+    
+    # Store original method
+    original_method = klass.instance_method(method_name)
+    method_key = "#{klass}##{method_name}"
+    
+    # Initialize tracking stats for this method
+    @@tracked_methods[method_key] ||= { calls: 0, total_time: 0 }
+    
+    # Replace with tracked version
+    klass.class_eval do
+      define_method(method_name) do |*args, &block|
+        Debugger.track_method_call(method_key, self, method_name, args) do
+          original_method.bind(self).call(*args, &block)
+        end
+      end
+    end
+    
+    log("Now tracking method: #{method_key}")
+  end
+  
+  # Helper for tracking a method call
+  def self.track_method_call(method_key, object, method_name, args)
+    return yield unless @@enabled && @@features[:method_tracking]
+    
+    @@call_depth += 1
+    indent = "  " * @@call_depth
+    
+    # Log method entry
+    args_str = args.map(&:inspect).join(", ")
+    log("#{indent}→ Entering #{method_key}(#{args_str})")
+    
+    # Log call stack if enabled
+    if @@features[:call_stack]
+      log("#{indent}  Call stack:")
+      caller[1..5].each_with_index do |line, i|
+        log("#{indent}    #{i+1}. #{line}")
+      end
+    end
+    
+    # Time the method call
+    start_time = Time.now
+    result = yield
+    end_time = Time.now
+    duration = end_time - start_time
+    
+    # Update statistics
+    @@tracked_methods[method_key][:calls] += 1
+    @@tracked_methods[method_key][:total_time] += duration
+    
+    # Log method exit
+    log("#{indent}← Exiting #{method_key} (took #{duration.round(6)}s) => #{result.inspect}")
+    
+    @@call_depth -= 1
+    result
+  end
+  
+  # Print tracking statistics
+  def self.print_tracking_stats
+    return unless @@enabled && @@features[:method_tracking]
+    
+    if @@tracked_methods.empty?
+      log("No methods have been tracked.")
+      return
+    end
+    
+    log("\n===== METHOD TRACKING STATISTICS =====")
+    sorted_methods = @@tracked_methods.sort_by { |_, stats| -stats[:total_time] }
+    
+    sorted_methods.each do |method_key, stats|
+      avg_time = stats[:calls] > 0 ? stats[:total_time] / stats[:calls] : 0
+      log("%s:\n  Calls: %d\n  Total time: %.6fs\n  Average time: %.6fs" % 
+          [method_key, stats[:calls], stats[:total_time], avg_time])
+    end
+    log("====================================\n")
+  end
+  
+  # Run a block with debugging enabled temporarily
+  def self.with_debug(options = {})
+    original_state = @@enabled
+    original_features = @@features.dup
+    
+    # Apply temporary options
+    self.enabled = true
+    options[:features]&.each do |feature, value|
+      toggle_feature(feature, value) if @@features.has_key?(feature)
+    end
+    
+    begin
+      log("Entering debug block with options: #{options}")
+      result = yield
+      log("Exiting debug block")
+      result
+    ensure
+      # Restore original state
+      @@enabled = original_state
+      @@features = original_features
+    end
+  end
+end
+
+#================================================
+# SAMPLE BUGGY PROGRAM TO DEBUG
+#================================================
+
+# A calculator class with bugs to demonstrate debugging
+class BuggyCalculator
+  def initialize
+    @operations_count = 0
+    @last_result = nil
+  end
+  
+  def add(a, b)
+    @operations_count += 1
+    @last_result = a + b
+  end
+  
+  def subtract(a, b)
+    @operations_count += 1
+    # BUG: Reversed operands
+    @last_result = b - a
+  end
+  
+  def multiply(a, b)
+    @operations_count += 1
+    @last_result = a * b
+  end
+  
+  def divide(a, b)
+    @operations_count += 1
+    # BUG: No division by zero check
+    @last_result = a / b
+  end
+  
+  def complicated_calculation(x, y, z)
+    # Perform a multi-step calculation with bugs
+    temp = multiply(x, y)
+    result = divide(temp, z)  # BUG: No check if z is zero
+    
+    # BUG: Off-by-one error in the loop
+    for i in 0..result
+      @last_result += i
+    end
+    
+    @last_result
+  end
+  
+  def stats
+    "Calculator performed #{@operations_count} operations. Last result: #{@last_result}"
+  end
+end
+
+# A class that uses the calculator
+class MathProcessor
+  def initialize
+    @calculator = BuggyCalculator.new
+    @results = []
+  end
+  
+  def process_operations(operations)
+    operations.each do |op|
+      begin
+        result = perform_operation(op)
+        @results << result
+        puts "Operation #{op[:type]} result: #{result}"
+      rescue => e
+        puts "Error performing #{op[:type]}: #{e.message}"
+      end
+    end
+  end
+  
+  def perform_operation(op)
+    case op[:type]
+    when :add
+      @calculator.add(op[:a], op[:b])
+    when :subtract
+      @calculator.subtract(op[:a], op[:b])
+    when :multiply
+      @calculator.multiply(op[:a], op[:b])
+    when :divide
+      @calculator.divide(op[:a], op[:b])
+    when :complex
+      @calculator.complicated_calculation(op[:a], op[:b], op[:c])
+    else
+      raise "Unknown operation type: #{op[:type]}"
+    end
+  end
+  
+  def print_results
+    puts "Results: #{@results.inspect}"
+    puts @calculator.stats
+  end
+end
+
+#================================================
+# DEBUGGING DEMONSTRATION
+#================================================
+
+# Initialize the debugger
+Debugger.init(
+  enabled: true,
+  log_file: "debug.log",
+  features: {
+    timing: true,
+    variable_inspection: true,
+    method_tracking: true,
+    call_stack: true
+  }
+)
+
+# Track methods in our buggy classes
+[BuggyCalculator, MathProcessor].each do |klass|
+  klass.instance_methods(false).each do |method|
+    Debugger.track_method(klass, method)
+  end
+end
+
+# Create a set of operations to perform
+operations = [
+  { type: :add, a: 5, b: 3 },                  # Should be 8
+  { type: :subtract, a: 10, b: 3 },             # BUG: Will be -7 instead of 7
+  { type: :multiply, a: 4, b: 2 },               # Should be 8
+  { type: :divide, a: 10, b: 2 },                # Should be 5
+  { type: :divide, a: 10, b: 0 },                # BUG: Division by zero
+  { type: :complex, a: 2, b: 3, c: 1 }           # Multiple bugs
+]
+
+# Process operations with debugging
+Debugger.log("Starting operation processing")
+
+Debugger.time_block("Full operation processing") do
+  processor = MathProcessor.new
+  
+  # Debug the processor object
+  Debugger.inspect_variables(
+    { processor: processor },
+    "before processing"
+  )
+  
+  # Process each operation with debugging
+  operations.each_with_index do |op, index|
+    Debugger.log("\nProcessing operation #{index + 1}: #{op[:type]}")
+    
+    # Debug the operation parameters
+    Debugger.inspect_variables(
+      { operation: op },
+      "operation parameters"
+    )
+    
+    # Use with_debug for specific operations to capture more detail
+    if [:divide, :complex].include?(op[:type])
+      Debugger.with_debug(features: { call_stack: true }) do
+        begin
+          processor.process_operations([op])
+        rescue => e
+          Debugger.error("Operation failed: #{e.class} - #{e.message}\n#{e.backtrace.join("\n")}")
+        end
+      end
+    else
+      # Normal processing for simpler operations
+      begin
+        processor.process_operations([op])
+      rescue => e
+        Debugger.error("Operation failed: #{e.message}")
+      end
+    end
+    
+    # Debug the processor after each operation
+    Debugger.inspect_variables(
+      { processor: processor },
+      "after operation #{index + 1}"
+    )
+  end
+  
+  processor.print_results
+end
+
+# Print method tracking statistics
+Debugger.print_tracking_stats
+
+# Shutdown the debugger
+Debugger.shutdown
+
+# Output summary of bugs found
+puts "\n===== BUGS IDENTIFIED ====="
+puts "1. BuggyCalculator#subtract: Operands are reversed (b - a instead of a - b)"
+puts "2. BuggyCalculator#divide: No division by zero check"
+puts "3. BuggyCalculator#complicated_calculation: No check if z is zero"
+puts "4. BuggyCalculator#complicated_calculation: Off-by-one error in the loop (0..result includes result)"
+
+# Fixed versions would be:
+=begin
+  def subtract(a, b)
+    @operations_count += 1
+    @last_result = a - b  # Fixed: a - b instead of b - a
+  end
+  
+  def divide(a, b)
+    @operations_count += 1
+    if b == 0  # Fixed: Added division by zero check
+      raise ZeroDivisionError, "Cannot divide by zero"
+    end
+    @last_result = a / b
+  end
+  
+  def complicated_calculation(x, y, z)
+    temp = multiply(x, y)
+    
+    # Fixed: Added check for z being zero
+    if z == 0
+      raise ZeroDivisionError, "Cannot divide by zero"
+    end
+    
+    result = divide(temp, z)
+    
+    # Fixed: Changed the loop to exclude the result itself
+    for i in 0...result  # Using ... instead of .. to fix off-by-one error
+      @last_result += i
+    end
+    
+    @last_result
+  end
+=end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Custom Exceptions</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

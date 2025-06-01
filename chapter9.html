@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 9: RubyGems - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>RubyGems</h1>
+        <p>Using and creating Ruby packages</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">Using RubyGems</button>
+                <button class="topic-btn" data-target="topic2">Finding and Evaluating Gems</button>
+                <button class="topic-btn" data-target="topic3">Creating Your Own Gems</button>
+                <button class="topic-btn" data-target="topic4">Publishing and Maintaining Gems</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>Using RubyGems</h2>
+            
+            <h3>What are RubyGems?</h3>
+            <p>RubyGems is Ruby's package manager. It provides a standard format for distributing Ruby libraries, a tool for managing gem installations, and a server for distributing them.</p>
+            
+            <h3>The Gem Command Line Tool</h3>
+            <p>The <code>gem</code> command allows you to install, update, and manage gems:</p>
+            
+            <div class="code-example">
+                <pre># Check installed gems
+$ gem list
+
+# Search for a gem
+$ gem search rails
+
+# Get information about a gem
+$ gem info nokogiri
+
+# Install a gem
+$ gem install httparty
+
+# Install a specific version
+$ gem install rails -v 7.0.0
+
+# Update a gem
+$ gem update rspec
+
+# Update all gems
+$ gem update
+
+# Uninstall a gem
+$ gem uninstall pry
+
+# Clean old versions
+$ gem cleanup</pre>
+            </div>
+            
+            <h3>Using Gems in Your Code</h3>
+            <p>Once installed, you can use gems in your Ruby code:</p>
+            
+            <div class="code-example">
+                <pre># Require a gem
+require 'httparty'
+
+# Use the gem's functionality
+response = HTTParty.get('https://api.example.com/data')
+
+# If the gem adds functionality to existing classes
+require 'active_support/all'
+"hello world".titleize  # => "Hello World"</pre>
+            </div>
+            
+            <h3>Managing Dependencies with Bundler</h3>
+            <p>Bundler is a tool that manages gem dependencies for your Ruby applications:</p>
+            
+            <div class="code-example">
+                <pre># Install Bundler
+$ gem install bundler
+
+# Create a Gemfile
+$ bundle init
+
+# Edit Gemfile to specify dependencies
+source 'https://rubygems.org'
+
+gem 'rails', '~> 7.0.0'
+gem 'pg', '~> 1.4'
+gem 'puma', '~> 5.6'
+
+group :development, :test do
+  gem 'rspec-rails', '~> 6.0'
+  gem 'pry-byebug'
+end
+
+group :test do
+  gem 'capybara'
+  gem 'selenium-webdriver'
+end
+
+# Install dependencies
+$ bundle install
+
+# Update dependencies
+$ bundle update
+
+# Execute a command in the context of the bundle
+$ bundle exec rspec</pre>
+            </div>
+            
+            <h3>Gemfile.lock and Version Locking</h3>
+            <p>When you run <code>bundle install</code>, Bundler creates a <code>Gemfile.lock</code> file that locks the exact versions of your dependencies and their dependencies:</p>
+            
+            <div class="code-example">
+                <pre># Gemfile.lock example (partial)
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actioncable (7.0.4)
+      actionpack (= 7.0.4)
+      activesupport (= 7.0.4)
+      nio4r (~> 2.0)
+      websocket-driver (>= 0.6.1)
+    actionmailbox (7.0.4)
+      actionpack (= 7.0.4)
+      activejob (= 7.0.4)
+      activerecord (= 7.0.4)
+      activestorage (= 7.0.4)
+      activesupport (= 7.0.4)
+      mail (>= 2.7.1)
+      net-imap
+      net-pop
+      net-smtp
+    # ... more dependencies</pre>
+            </div>
+            
+            <h3>Semantic Versioning</h3>
+            <p>RubyGems follows Semantic Versioning (SemVer) with three numbers: MAJOR.MINOR.PATCH:</p>
+            <ul>
+                <li><strong>MAJOR</strong>: Incremented for incompatible API changes</li>
+                <li><strong>MINOR</strong>: Incremented for backward-compatible new functionality</li>
+                <li><strong>PATCH</strong>: Incremented for backward-compatible bug fixes</li>
+            </ul>
+            
+            <div class="code-example">
+                <pre># Version specifiers in Gemfile
+gem 'nokogiri', '1.13.9'      # Exactly version 1.13.9
+gem 'rails', '~> 7.0.0'        # >= 7.0.0, < 7.1.0 (pessimistic versioning)
+gem 'puma', '>= 5.6.4'         # Version 5.6.4 or higher
+gem 'webpacker', '< 6.0'       # Any version less than 6.0
+gem 'rspec', '>= 3.10', '< 4'  # Version 3.10 or higher, but less than 4</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Dependency Management</h4>
+                <p>Create a simple Ruby application that uses Bundler to manage dependencies:</p>
+                <ol>
+                    <li>Create a new directory for your project</li>
+                    <li>Initialize Bundler with <code>bundle init</code></li>
+                    <li>Edit the Gemfile to include:
+                        <ul>
+                            <li>HTTParty for API requests</li>
+                            <li>Nokogiri for HTML parsing</li>
+                            <li>Terminal-table for displaying tabular data</li>
+                            <li>RSpec for testing (in the development group)</li>
+                        </ul>
+                    </li>
+                    <li>Install the dependencies</li>
+                    <li>Create a Ruby script that:
+                        <ul>
+                            <li>Fetches data from a public API using HTTParty</li>
+                            <li>Parses HTML from a website using Nokogiri</li>
+                            <li>Displays the results in a nice table</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Finding and Evaluating Gems →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Finding and Evaluating Gems</h2>
+            
+            <h3>Where to Find Gems</h3>
+            <ul>
+                <li><a href="https://rubygems.org" target="_blank">RubyGems.org</a> - The official Ruby community gem hosting service</li>
+                <li><a href="https://github.com" target="_blank">GitHub</a> - Many gems are hosted on GitHub with source code</li>
+                <li><a href="https://www.ruby-toolbox.com" target="_blank">The Ruby Toolbox</a> - Categorized overview of Ruby gems</li>
+                <li>Blog posts and tutorials often recommend gems for specific tasks</li>
+            </ul>
+            
+            <h3>Popular Ruby Gems</h3>
+            <p>Here are some of the most widely used Ruby gems:</p>
+            <ul>
+                <li><strong>Rails</strong> - Web application framework</li>
+                <li><strong>ActiveRecord</strong> - ORM (Object-Relational Mapping) for databases</li>
+                <li><strong>Devise</strong> - Authentication solution</li>
+                <li><strong>RSpec</strong> - Testing framework</li>
+                <li><strong>Sidekiq</strong> - Background job processing</li>
+                <li><strong>Nokogiri</strong> - HTML/XML parsing</li>
+                <li><strong>HTTParty</strong> - HTTP client</li>
+                <li><strong>Puma</strong> - Web server</li>
+                <li><strong>Capybara</strong> - Web application testing</li>
+                <li><strong>Pundit</strong> - Authorization</li>
+            </ul>
+            
+            <h3>Evaluating Gem Quality</h3>
+            <p>Before adding a gem to your project, consider these factors:</p>
+            
+            <h4>Popularity and Community</h4>
+            <ul>
+                <li>Number of downloads</li>
+                <li>GitHub stars, watchers, and forks</li>
+                <li>Active contributors</li>
+                <li>Recent releases and commit activity</li>
+            </ul>
+            
+            <h4>Documentation</h4>
+            <ul>
+                <li>Quality of README and docs</li>
+                <li>Clear examples</li>
+                <li>API documentation</li>
+                <li>Tutorial or guides</li>
+            </ul>
+            
+            <h4>Code Quality</h4>
+            <ul>
+                <li>Test coverage</li>
+                <li>Code style and organization</li>
+                <li>Open issues and pull requests</li>
+                <li>CI/CD integration</li>
+            </ul>
+            
+            <h4>Maintenance</h4>
+            <ul>
+                <li>Last update/release date</li>
+                <li>Responsiveness to issues</li>
+                <li>Compatibility with newer Ruby versions</li>
+                <li>Release frequency</li>
+            </ul>
+            
+            <h3>Gem Alternatives</h3>
+            <p>Sometimes you need to choose between similar gems:</p>
+            
+            <div class="code-example">
+                <pre># HTTP Clients
+gem 'httparty'     # Simple and popular
+gem 'faraday'      # Middleware-based, flexible
+gem 'rest-client'  # Simple RESTful operations
+gem 'http'         # Chainable, modern API
+
+# Authentication
+gem 'devise'       # Full-featured, integrated with Rails
+gem 'sorcery'      # Simpler, more flexible
+gem 'clearance'    # Minimalist approach
+gem 'omniauth'     # Third-party authentication
+
+# Background Jobs
+gem 'sidekiq'      # Redis-backed, feature-rich
+gem 'delayed_job'  # Database-backed
+gem 'resque'       # Redis-backed, simpler than Sidekiq
+gem 'good_job'     # PostgreSQL-based</pre>
+            </div>
+            
+            <h3>Security Considerations</h3>
+            <p>Adding gems to your project introduces potential security risks:</p>
+            <ul>
+                <li>Check for known vulnerabilities (e.g., using <code>bundle audit</code>)</li>
+                <li>Review code before adding a gem with few users</li>
+                <li>Keep dependencies updated</li>
+                <li>Be cautious with gems requiring excessive permissions</li>
+                <li>Consider the impact on your application's security</li>
+            </ul>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Gem Evaluation</h4>
+                <p>Research and evaluate gems for a specific purpose:</p>
+                <ol>
+                    <li>Choose a category (e.g., authentication, file upload, PDF generation)</li>
+                    <li>Find at least three gems that address this need</li>
+                    <li>Create a comparison document that:
+                        <ul>
+                            <li>Evaluates each gem on popularity, documentation, code quality, and maintenance</li>
+                            <li>Lists pros and cons of each gem</li>
+                            <li>Provides sample code for basic usage of each gem</li>
+                            <li>Makes a recommendation with justification</li>
+                        </ul>
+                    </li>
+                    <li>Write a simple script that demonstrates the basic functionality of your recommended gem</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Using RubyGems</button>
+                <button class="btn next-btn">Next: Creating Your Own Gems →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Creating Your Own Gems</h2>
+            
+            <h3>Why Create a Gem?</h3>
+            <p>There are several reasons to package your code as a gem:</p>
+            <ul>
+                <li>Share code across multiple projects</li>
+                <li>Contribute to the Ruby community</li>
+                <li>Organize code in a structured way</li>
+                <li>Make dependencies explicit</li>
+                <li>Make it easy for others to use your code</li>
+            </ul>
+            
+            <h3>Gem Structure</h3>
+            <p>A typical gem has the following directory structure:</p>
+            
+            <div class="code-example">
+                <pre>my_gem/
+├── bin/                    # Executable files
+├── lib/                    # The main code
+│   ├── my_gem.rb           # Main file that defines the gem
+│   └── my_gem/             # Subdirectory for the gem's classes
+│       ├── version.rb      # Defines the gem version
+│       └── other_files.rb  # Additional code
+├── spec/ or test/          # Tests for the gem
+├── .gitignore              # Files to ignore in version control
+├── Gemfile                 # Dependencies for development
+├── LICENSE.txt             # License information
+├── my_gem.gemspec          # Gem specification
+└── README.md               # Documentation</pre>
+            </div>
+            
+            <h3>Creating a Gem from Scratch</h3>
+            
+            <div class="code-example">
+                <pre># Create gem directory structure
+$ mkdir -p my_gem/lib/my_gem
+$ cd my_gem
+
+# Create version file
+$ cat > lib/my_gem/version.rb << EOF
+module MyGem
+  VERSION = "0.1.0"
+end
+EOF
+
+# Create main file
+$ cat > lib/my_gem.rb << EOF
+require "my_gem/version"
+
+module MyGem
+  class Error < StandardError; end
+  
+  # Your code goes here...
+end
+EOF
+
+# Create gemspec
+$ cat > my_gem.gemspec << EOF
+require_relative 'lib/my_gem/version'
+
+Gem::Specification.new do |spec|
+  spec.name          = "my_gem"
+  spec.version       = MyGem::VERSION
+  spec.authors       = ["Your Name"]
+  spec.email         = ["your.email@example.com"]
+
+  spec.summary       = "Short description of my_gem"
+  spec.description   = "Longer description of my_gem"
+  spec.homepage      = "https://github.com/username/my_gem"
+  spec.license       = "MIT"
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
+
+  spec.metadata["homepage_uri"] = spec.homepage
+  spec.metadata["source_code_uri"] = spec.homepage
+  spec.metadata["changelog_uri"] = "\#{spec.homepage}/blob/main/CHANGELOG.md"
+
+  # Specify which files should be included
+  spec.files = Dir.glob("{bin,lib}/**/*") + %w[LICENSE.txt README.md]
+  spec.bindir        = "bin"
+  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.require_paths = ["lib"]
+
+  # Runtime dependencies
+  spec.add_dependency "nokogiri", "~> 1.13"
+  
+  # Development dependencies
+  spec.add_development_dependency "rspec", "~> 3.10"
+  spec.add_development_dependency "rake", "~> 13.0"
+end
+EOF
+
+# Create README
+$ cat > README.md << EOF
+# MyGem
+
+Description of what your gem does.
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+\`\`\`ruby
+gem 'my_gem'
+\`\`\`
+
+And then execute:
+
+    $ bundle install
+
+Or install it yourself as:
+
+    $ gem install my_gem
+
+## Usage
+
+\`\`\`ruby
+require 'my_gem'
+
+# Example code here
+\`\`\`
+
+## Development
+
+After checking out the repo, run \`bin/setup\` to install dependencies. Then, run \`rake spec\` to run the tests.
+
+## Contributing
+
+Bug reports and pull requests are welcome.
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+EOF
+
+# Create Gemfile
+$ cat > Gemfile << EOF
+source "https://rubygems.org"
+
+# Specify your gem's dependencies in my_gem.gemspec
+gemspec
+EOF</pre>
+            </div>
+            
+            <h3>Using Bundler to Generate a Gem</h3>
+            <p>Bundler provides a generator for creating new gems with all the necessary boilerplate:</p>
+            
+            <div class="code-example">
+                <pre># Install bundler if you haven't already
+$ gem install bundler
+
+# Generate a new gem
+$ bundle gem my_gem
+
+# Follow the prompts to configure:
+# - Tests (RSpec, Minitest, or Test::Unit)
+# - Code of Conduct
+# - MIT License
+# - Changelog
+# - GitHub Actions workflow</pre>
+            </div>
+            
+            <h3>Adding Functionality to Your Gem</h3>
+            <p>Let's add some actual functionality to our gem:</p>
+            
+            <div class="code-example">
+                <pre># lib/my_gem.rb
+require "my_gem/version"
+require "my_gem/calculator"
+
+module MyGem
+  class Error < StandardError; end
+  
+  # Your code goes here...
+end
+
+# lib/my_gem/calculator.rb
+module MyGem
+  class Calculator
+    def add(a, b)
+      a + b
+    end
+    
+    def subtract(a, b)
+      a - b
+    end
+    
+    def multiply(a, b)
+      a * b
+    end
+    
+    def divide(a, b)
+      raise Error, "Division by zero" if b.zero?
+      a / b.to_f
+    end
+  end
+end</pre>
+            </div>
+            
+            <h3>Testing Your Gem</h3>
+            <p>Testing is crucial for gem development. Let's add tests using RSpec:</p>
+            
+            <div class="code-example">
+                <pre># spec/my_gem/calculator_spec.rb
+require "spec_helper"
+
+RSpec.describe MyGem::Calculator do
+  let(:calculator) { described_class.new }
+  
+  describe "#add" do
+    it "adds two numbers" do
+      expect(calculator.add(2, 3)).to eq(5)
+    end
+  end
+  
+  describe "#subtract" do
+    it "subtracts second number from first" do
+      expect(calculator.subtract(5, 3)).to eq(2)
+    end
+  end
+  
+  describe "#multiply" do
+    it "multiplies two numbers" do
+      expect(calculator.multiply(2, 3)).to eq(6)
+    end
+  end
+  
+  describe "#divide" do
+    it "divides first number by second" do
+      expect(calculator.divide(6, 3)).to eq(2.0)
+    end
+    
+    it "returns float even for whole number results" do
+      expect(calculator.divide(6, 3)).to be_a(Float)
+    end
+    
+    it "raises an error when dividing by zero" do
+      expect { calculator.divide(6, 0) }.to raise_error(MyGem::Error, "Division by zero")
+    end
+  end
+end</pre>
+            </div>
+            
+            <h3>Building and Installing Your Gem Locally</h3>
+            
+            <div class="code-example">
+                <pre># Build the gem
+$ gem build my_gem.gemspec
+
+# Install the gem locally
+$ gem install ./my_gem-0.1.0.gem
+
+# Test it out
+$ irb -r my_gem
+irb(main):001:0> calc = MyGem::Calculator.new
+irb(main):002:0> calc.add(2, 3)
+=> 5</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: String Utilities Gem</h4>
+                <p>Create a gem that provides useful string manipulation utilities:</p>
+                <ol>
+                    <li>Use Bundler to generate a new gem called <code>string_utilities</code></li>
+                    <li>Implement several string utility methods, such as:
+                        <ul>
+                            <li>Converting strings to title case</li>
+                            <li>Truncating strings with ellipsis</li>
+                            <li>Generating random strings</li>
+                            <li>Removing accents from characters</li>
+                            <li>Extracting URLs from text</li>
+                            <li>Word/character counting with various options</li>
+                        </ul>
+                    </li>
+                    <li>Write comprehensive tests for all functionality</li>
+                    <li>Document your gem thoroughly with a README and inline documentation</li>
+                    <li>Build and install your gem locally</li>
+                    <li>Create a sample script that uses your gem</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Finding and Evaluating Gems</button>
+                <button class="btn next-btn">Next: Publishing and Maintaining Gems →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Publishing and Maintaining Gems</h2>
+            
+            <h3>Preparing Your Gem for Publication</h3>
+            <p>Before publishing, ensure your gem is ready:</p>
+            <ul>
+                <li>All tests pass</li>
+                <li>Documentation is complete and accurate</li>
+                <li>The gem works as expected when installed locally</li>
+                <li>Version number follows Semantic Versioning</li>
+                <li>LICENSE file is included</li>
+                <li>README includes installation and usage instructions</li>
+            </ul>
+            
+            <h3>Publishing to RubyGems.org</h3>
+            <p>RubyGems.org is the main repository for Ruby gems:</p>
+            
+            <div class="code-example">
+                <pre># Create an account on RubyGems.org if you don't have one
+$ gem push my_gem-0.1.0.gem
+
+# You'll be prompted for your RubyGems.org credentials the first time
+# After that, your API key will be stored in ~/.gem/credentials</pre>
+            </div>
+            
+            <h3>Gem Versioning Best Practices</h3>
+            <p>Follow these best practices for versioning your gem:</p>
+            <ul>
+                <li>Use Semantic Versioning (MAJOR.MINOR.PATCH)</li>
+                <li>Increment PATCH for backwards-compatible bug fixes</li>
+                <li>Increment MINOR for backwards-compatible new features</li>
+                <li>Increment MAJOR for backwards-incompatible changes</li>
+                <li>Keep a changelog to document changes between versions</li>
+                <li>Use version constants for internal version references</li>
+            </ul>
+            
+            <div class="code-example">
+                <pre># lib/my_gem/version.rb
+module MyGem
+  # Version bump process:
+  # 1. Update the version number
+  # 2. Update CHANGELOG.md
+  # 3. Commit changes: git commit -am "Bump version to x.y.z"
+  # 4. Create a tag: git tag -a v1.0.0 -m "Version 1.0.0"
+  # 5. Push changes: git push && git push --tags
+  # 6. Build and publish the gem
+  VERSION = "0.1.0"
+end</pre>
+            </div>
+            
+            <h3>Maintaining a Changelog</h3>
+            <p>A well-maintained changelog helps users understand what's changed between versions:</p>
+            
+            <div class="code-example">
+                <pre># CHANGELOG.md
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+### Added
+- New feature planned for next release
+
+## [0.2.0] - 2025-04-15
+### Added
+- New method `Calculator#square_root`
+- Support for Ruby 3.2
+
+### Changed
+- Improved error messages
+
+### Fixed
+- Bug in `Calculator#divide` with negative numbers
+
+## [0.1.0] - 2025-03-01
+### Added
+- Initial release
+- Basic calculator functionality (add, subtract, multiply, divide)</pre>
+            </div>
+            
+            <h3>Handling Dependencies</h3>
+            <p>Managing dependencies in your gem is crucial for compatibility:</p>
+            
+            <div class="code-example">
+                <pre># In your gemspec
+spec.add_dependency "nokogiri", "~> 1.13"  # Runtime dependency
+spec.add_development_dependency "rspec", "~> 3.10"  # Development dependency
+
+# Version specifications
+"~> 1.13"    # >= 1.13.0, < 2.0.0 (compatible with 1.13.x)
+">= 1.13.0"  # 1.13.0 or higher
+"< 2.0"      # Anything less than 2.0
+"= 1.13.9"   # Exactly 1.13.9
+"~> 1.13.0"  # >= 1.13.0, < 1.14.0 (compatible with 1.13.x only)</pre>
+            </div>
+            
+            <h3>Continuous Integration for Gems</h3>
+            <p>Set up CI to automatically test your gem across different Ruby versions:</p>
+            
+            <div class="code-example">
+                <pre># .github/workflows/ci.yml (GitHub Actions)
+name: Ruby
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ['2.7', '3.0', '3.1', '3.2']
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true
+    - name: Install dependencies
+      run: bundle install
+    - name: Run tests
+      run: bundle exec rake test</pre>
+            </div>
+            
+            <h3>Gem Maintenance Cycle</h3>
+            <p>The ongoing maintenance of a gem typically includes:</p>
+            <ol>
+                <li>Reviewing and merging pull requests</li>
+                <li>Addressing issues reported by users</li>
+                <li>Updating dependencies to address security concerns</li>
+                <li>Adding new features</li>
+                <li>Fixing bugs</li>
+                <li>Releasing new versions</li>
+                <li>Updating documentation</li>
+                <li>Ensuring compatibility with new Ruby versions</li>
+            </ol>
+            
+            <h3>Deprecating Features and Gems</h3>
+            <p>When it's time to deprecate features or entire gems:</p>
+            
+            <div class="code-example">
+                <pre># Deprecating a method
+module MyGem
+  class Calculator
+    def old_method
+      warn "[DEPRECATION] `old_method` is deprecated and will be removed in version 2.0. " \
+           "Use `new_method` instead."
+      # Method implementation
+    end
+  end
+end
+
+# In your gemspec, for a deprecated gem
+spec.post_install_message = <<-MESSAGE
+!    The 'my_gem' gem has been deprecated and will be retired in 2025.
+!    Please use 'new_gem' instead.
+!    See: https://github.com/username/new_gem
+MESSAGE</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Gem Publication and Maintenance</h4>
+                <p>Take your String Utilities gem from the previous project and prepare it for publication:</p>
+                <ol>
+                    <li>Set up a GitHub repository for your gem</li>
+                    <li>Implement a CI workflow using GitHub Actions</li>
+                    <li>Create a comprehensive CHANGELOG.md file</li>
+                    <li>Add detailed documentation including usage examples</li>
+                    <li>Set up proper version management</li>
+                    <li>Prepare the gem for publishing (you don't need to actually publish it)</li>
+                    <li>Create a release plan for future versions</li>
+                    <li>Document your maintenance strategy</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Creating Your Own Gems</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

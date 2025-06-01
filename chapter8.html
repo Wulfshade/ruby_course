@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 8: API Development - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>API Development</h1>
+        <p>Building and consuming APIs with Ruby</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">RESTful API Basics</button>
+                <button class="topic-btn" data-target="topic2">Consuming APIs</button>
+                <button class="topic-btn" data-target="topic3">Building APIs with Sinatra</button>
+                <button class="topic-btn" data-target="topic4">Authentication and Security</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>RESTful API Basics</h2>
+            
+            <h3>What is an API?</h3>
+            <p>An API (Application Programming Interface) allows different software applications to communicate with each other. In web development, APIs typically expose endpoints that accept HTTP requests and return data, usually in JSON or XML format.</p>
+            
+            <h3>REST Architecture</h3>
+            <p>REST (Representational State Transfer) is an architectural style for designing networked applications. RESTful APIs use HTTP methods explicitly and follow a uniform structure.</p>
+            
+            <h3>Key REST Principles</h3>
+            <ul>
+                <li><strong>Resources</strong>: Everything is a resource, identified by a URL</li>
+                <li><strong>HTTP Methods</strong>: Use standard methods (GET, POST, PUT, DELETE) for operations</li>
+                <li><strong>Stateless</strong>: Each request from client to server must contain all information needed to understand and process the request</li>
+                <li><strong>Representation</strong>: Resources can have multiple representations (JSON, XML, HTML)</li>
+            </ul>
+            
+            <h3>HTTP Methods and CRUD Operations</h3>
+            <div class="code-example">
+                <pre>GET    /users        # Retrieve all users
+GET    /users/123    # Retrieve a specific user
+POST   /users        # Create a new user
+PUT    /users/123    # Update a user completely
+PATCH  /users/123    # Update a user partially
+DELETE /users/123    # Delete a user</pre>
+            </div>
+            
+            <h3>HTTP Status Codes</h3>
+            <p>Status codes indicate the result of the HTTP request:</p>
+            <ul>
+                <li><strong>2xx</strong> - Success (200 OK, 201 Created, 204 No Content)</li>
+                <li><strong>3xx</strong> - Redirection (301 Moved Permanently, 304 Not Modified)</li>
+                <li><strong>4xx</strong> - Client Error (400 Bad Request, 401 Unauthorized, 404 Not Found)</li>
+                <li><strong>5xx</strong> - Server Error (500 Internal Server Error, 503 Service Unavailable)</li>
+            </ul>
+            
+            <h3>JSON and API Responses</h3>
+            <p>JSON (JavaScript Object Notation) is the most common format for API responses due to its simplicity and compatibility.</p>
+            
+            <div class="code-example">
+                <pre># Example JSON response for a user request
+{
+  "id": 123,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "created_at": "2025-01-15T14:30:00Z",
+  "roles": ["admin", "editor"],
+  "settings": {
+    "notifications": true,
+    "theme": "dark"
+  }
+}</pre>
+            </div>
+            
+            <h3>API Documentation</h3>
+            <p>Good documentation is crucial for APIs. It should include:</p>
+            <ul>
+                <li>Available endpoints and methods</li>
+                <li>Required parameters</li>
+                <li>Authentication methods</li>
+                <li>Example requests and responses</li>
+                <li>Error handling</li>
+            </ul>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Design a RESTful API</h4>
+                <p>Design a RESTful API for a book library system:</p>
+                <ol>
+                    <li>Define the resources (books, authors, users, etc.)</li>
+                    <li>Design endpoints for each resource with appropriate HTTP methods</li>
+                    <li>Define JSON response formats for each endpoint</li>
+                    <li>Document your API in a README file</li>
+                    <li>Consider potential error scenarios and how they should be handled</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Consuming APIs →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Consuming APIs</h2>
+            
+            <h3>HTTP Libraries in Ruby</h3>
+            <p>Ruby offers several libraries for making HTTP requests to APIs:</p>
+            
+            <h4>Net::HTTP (Standard Library)</h4>
+            <div class="code-example">
+                <pre>require 'net/http'
+require 'json'
+require 'uri'
+
+# Simple GET request
+uri = URI('https://api.example.com/users')
+response = Net::HTTP.get(uri)
+users = JSON.parse(response)
+
+# POST request with headers and body
+uri = URI('https://api.example.com/users')
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true if uri.scheme == 'https'
+
+request = Net::HTTP::Post.new(uri.path, {
+  'Content-Type' => 'application/json',
+  'Authorization' => 'Bearer token123'
+})
+request.body = { name: 'John', email: 'john@example.com' }.to_json
+
+response = http.request(request)
+result = JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)</pre>
+            </div>
+            
+            <h4>HTTParty Gem</h4>
+            <p>HTTParty simplifies HTTP requests with a clean, chainable syntax:</p>
+            
+            <div class="code-example">
+                <pre>require 'httparty'
+
+# Basic usage
+response = HTTParty.get('https://api.example.com/users')
+users = response.parsed_response
+
+# With options
+response = HTTParty.post(
+  'https://api.example.com/users',
+  headers: {
+    'Content-Type' => 'application/json',
+    'Authorization' => 'Bearer token123'
+  },
+  body: {
+    name: 'John',
+    email: 'john@example.com'
+  }.to_json
+)
+
+# As a class
+class ExampleAPI
+  include HTTParty
+  base_uri 'api.example.com'
+  headers 'Content-Type' => 'application/json'
+  
+  def self.get_users
+    get('/users')
+  end
+  
+  def self.create_user(name, email)
+    post('/users', body: { name: name, email: email }.to_json)
+  end
+end
+
+users = ExampleAPI.get_users
+new_user = ExampleAPI.create_user('John', 'john@example.com')</pre>
+            </div>
+            
+            <h3>Handling Authentication</h3>
+            
+            <h4>API Keys</h4>
+            <div class="code-example">
+                <pre>require 'httparty'
+
+response = HTTParty.get(
+  'https://api.example.com/data',
+  query: { api_key: 'your_api_key_here' }
+)
+
+# Or in headers
+response = HTTParty.get(
+  'https://api.example.com/data',
+  headers: { 'X-API-Key' => 'your_api_key_here' }
+)</pre>
+            </div>
+            
+            <h4>OAuth</h4>
+            <div class="code-example">
+                <pre>require 'oauth2'
+
+# Initialize the client
+client = OAuth2::Client.new(
+  'client_id',
+  'client_secret',
+  site: 'https://api.example.com'
+)
+
+# Get authorization URL
+auth_url = client.auth_code.authorize_url(redirect_uri: 'http://localhost:8080/callback')
+
+# After user authorization, exchange code for token
+token = client.auth_code.get_token(
+  'authorization_code',
+  redirect_uri: 'http://localhost:8080/callback'
+)
+
+# Use the access token
+response = token.get('/api/resource')
+data = JSON.parse(response.body)</pre>
+            </div>
+            
+            <h3>Error Handling</h3>
+            <p>When consuming APIs, it's important to handle errors gracefully:</p>
+            
+            <div class="code-example">
+                <pre>require 'httparty'
+
+begin
+  response = HTTParty.get('https://api.example.com/users')
+  
+  case response.code
+  when 200
+    users = response.parsed_response
+    # Process users...
+  when 401
+    puts "Authentication failed"
+  when 404
+    puts "Resource not found"
+  else
+    puts "Error: #{response.code} - #{response.message}"
+  end
+rescue HTTParty::Error => e
+  puts "HTTParty error: #{e.message}"
+rescue StandardError => e
+  puts "Request failed: #{e.message}"
+end</pre>
+            </div>
+            
+            <h3>Parsing JSON</h3>
+            <p>Ruby's standard library includes JSON parsing capabilities:</p>
+            
+            <div class="code-example">
+                <pre>require 'json'
+
+# Parse JSON string to Ruby objects
+json_string = '{"name":"John","age":30,"city":"New York"}'
+parsed = JSON.parse(json_string)
+puts parsed["name"]  # => John
+
+# Convert Ruby objects to JSON
+user = { name: "Jane", age: 28, city: "London" }
+json = JSON.generate(user)
+# or
+json = user.to_json</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Weather App</h4>
+                <p>Create a Ruby command-line application that:</p>
+                <ol>
+                    <li>Consumes a public weather API (e.g., OpenWeatherMap, WeatherAPI)</li>
+                    <li>Allows users to search for weather by city name</li>
+                    <li>Displays current weather conditions (temperature, humidity, conditions, etc.)</li>
+                    <li>Handles API errors gracefully</li>
+                    <li>Includes options for displaying temperatures in Celsius or Fahrenheit</li>
+                    <li>Caches results for a short period to avoid excessive API calls</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: RESTful API Basics</button>
+                <button class="btn next-btn">Next: Building APIs with Sinatra →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Building APIs with Sinatra</h2>
+            
+            <h3>Introduction to Sinatra</h3>
+            <p>Sinatra is a lightweight Ruby web framework, perfect for building APIs. It's simpler than Rails but powerful enough for many API needs.</p>
+            
+            <div class="code-example">
+                <pre>require 'sinatra'
+require 'json'
+
+# Basic route
+get '/' do
+  content_type :json
+  { message: 'Hello, World!' }.to_json
+end</pre>
+            </div>
+            
+            <h3>Setting Up a Sinatra API</h3>
+            
+            <div class="code-example">
+                <pre># Install the gem
+$ gem install sinatra sinatra-contrib
+
+# Create a basic API server
+require 'sinatra'
+require 'sinatra/json'
+require 'json'
+
+# Configure Sinatra
+configure do
+  set :port, 3000
+  set :bind, '0.0.0.0'
+  enable :logging
+end
+
+# Sample data
+USERS = [
+  { id: 1, name: 'Alice', email: 'alice@example.com' },
+  { id: 2, name: 'Bob', email: 'bob@example.com' }
+]
+
+# Routes
+get '/api/users' do
+  json USERS
+end
+
+get '/api/users/:id' do
+  user = USERS.find { |u| u[:id] == params[:id].to_i }
+  if user
+    json user
+  else
+    status 404
+    json({ error: 'User not found' })
+  end
+end</pre>
+            </div>
+            
+            <h3>RESTful Routes in Sinatra</h3>
+            
+            <div class="code-example">
+                <pre>require 'sinatra'
+require 'sinatra/json'
+require 'json'
+
+# In-memory storage
+books = []
+next_id = 1
+
+# GET all books
+get '/api/books' do
+  json books
+end
+
+# GET a specific book
+get '/api/books/:id' do
+  book = books.find { |b| b[:id] == params[:id].to_i }
+  if book
+    json book
+  else
+    status 404
+    json({ error: 'Book not found' })
+  end
+end
+
+# POST a new book
+post '/api/books' do
+  # Parse request body
+  request_payload = JSON.parse(request.body.read, symbolize_names: true)
+  
+  # Create new book
+  book = {
+    id: next_id,
+    title: request_payload[:title],
+    author: request_payload[:author],
+    created_at: Time.now
+  }
+  
+  # Save and increment ID
+  books << book
+  next_id += 1
+  
+  # Return the created book
+  status 201
+  json book
+end
+
+# PUT/update a book
+put '/api/books/:id' do
+  book = books.find { |b| b[:id] == params[:id].to_i }
+  
+  if book
+    request_payload = JSON.parse(request.body.read, symbolize_names: true)
+    
+    book[:title] = request_payload[:title]
+    book[:author] = request_payload[:author]
+    book[:updated_at] = Time.now
+    
+    json book
+  else
+    status 404
+    json({ error: 'Book not found' })
+  end
+end
+
+# DELETE a book
+delete '/api/books/:id' do
+  index = books.find_index { |b| b[:id] == params[:id].to_i }
+  
+  if index
+    book = books.delete_at(index)
+    status 204
+  else
+    status 404
+    json({ error: 'Book not found' })
+  end
+end</pre>
+            </div>
+            
+            <h3>Request and Response Handling</h3>
+            
+            <div class="code-example">
+                <pre># Accessing URL parameters
+get '/api/users/:id' do
+  user_id = params[:id]
+  # ...
+end
+
+# Query parameters
+get '/api/search' do
+  query = params[:q]
+  limit = params[:limit] || 10
+  # ...
+end
+
+# Accessing request body
+post '/api/users' do
+  # For JSON requests
+  payload = JSON.parse(request.body.read, symbolize_names: true)
+  
+  # For form submissions
+  form_data = params
+end
+
+# Setting status codes
+get '/api/restricted' do
+  status 401
+  json({ error: 'Unauthorized' })
+end
+
+# Setting headers
+get '/api/cached-data' do
+  cache_time = 3600 # 1 hour
+  headers['Cache-Control'] = "public, max-age=#{cache_time}"
+  json({ data: 'This response is cached' })
+end</pre>
+            </div>
+            
+            <h3>Middleware in Sinatra</h3>
+            <p>Middleware allows you to process requests and responses before they reach your routes:</p>
+            
+            <div class="code-example">
+                <pre>require 'sinatra'
+require 'sinatra/json'
+
+# CORS middleware
+before do
+  headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+  headers['Access-Control-Allow-Origin'] = '*'
+  headers['Access-Control-Allow-Headers'] = 'accept, authorization, content-type'
+end
+
+# Handle OPTIONS requests
+options '*' do
+  200
+end
+
+# Authentication middleware
+before '/api/protected/*' do
+  auth_token = request.env['HTTP_AUTHORIZATION']&.split(' ')&.last
+  
+  unless valid_token?(auth_token)
+    halt 401, json({ error: 'Unauthorized' })
+  end
+end
+
+# Logging middleware
+before do
+  logger.info "Request: #{request.request_method} #{request.path}"
+end
+
+after do
+  logger.info "Response: #{response.status}"
+end</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Task Manager API</h4>
+                <p>Create a RESTful API for a task management application using Sinatra:</p>
+                <ol>
+                    <li>Set up a Sinatra application with appropriate routes for tasks</li>
+                    <li>Implement CRUD operations (Create, Read, Update, Delete) for tasks</li>
+                    <li>Include features like:
+                        <ul>
+                            <li>Task filtering by status, priority, or due date</li>
+                            <li>Task searching by title or description</li>
+                            <li>Task assignment to users</li>
+                        </ul>
+                    </li>
+                    <li>Implement proper error handling and status codes</li>
+                    <li>Add request validation to ensure data integrity</li>
+                    <li>Include basic authentication for protected routes</li>
+                    <li>Document your API with clear examples</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Consuming APIs</button>
+                <button class="btn next-btn">Next: Authentication and Security →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Authentication and Security</h2>
+            
+            <h3>API Authentication Methods</h3>
+            <p>Protecting your API is essential. Here are common authentication methods:</p>
+            
+            <h4>API Keys</h4>
+            <div class="code-example">
+                <pre>require 'sinatra'
+require 'sinatra/json'
+
+# Define valid API keys
+VALID_API_KEYS = ['abc123', 'xyz789']
+
+# API key middleware
+before '/api/*' do
+  api_key = request.env['HTTP_X_API_KEY'] || params['api_key']
+  
+  unless VALID_API_KEYS.include?(api_key)
+    halt 401, json({ error: 'Invalid API key' })
+  end
+end
+
+get '/api/data' do
+  json({ message: 'This is protected data' })
+end</pre>
+            </div>
+            
+            <h4>Token-based Authentication (JWT)</h4>
+            <div class="code-example">
+                <pre>require 'sinatra'
+require 'sinatra/json'
+require 'jwt'
+
+# Secret for signing tokens
+JWT_SECRET = 'your_secret_key'
+
+# Generate a token
+post '/api/login' do
+  username = params[:username]
+  password = params[:password]
+  
+  # Validate credentials (in a real app, check against database)
+  if username == 'admin' && password == 'password'
+    # Create payload
+    payload = {
+      user_id: 1,
+      username: username,
+      exp: Time.now.to_i + 3600 # 1 hour expiration
+    }
+    
+    # Generate token
+    token = JWT.encode(payload, JWT_SECRET, 'HS256')
+    
+    json({ token: token })
+  else
+    status 401
+    json({ error: 'Invalid credentials' })
+  end
+end
+
+# Verify token middleware
+before '/api/protected/*' do
+  auth_header = request.env['HTTP_AUTHORIZATION']
+  
+  if auth_header && auth_header.start_with?('Bearer ')
+    token = auth_header.gsub('Bearer ', '')
+    
+    begin
+      # Decode and verify token
+      decoded_token = JWT.decode(token, JWT_SECRET, true, { algorithm: 'HS256' })
+      @current_user = decoded_token.first
+    rescue JWT::ExpiredSignature
+      halt 401, json({ error: 'Token expired' })
+    rescue JWT::DecodeError
+      halt 401, json({ error: 'Invalid token' })
+    end
+  else
+    halt 401, json({ error: 'Authorization header missing' })
+  end
+end
+
+get '/api/protected/profile' do
+  json({
+    user_id: @current_user['user_id'],
+    username: @current_user['username']
+  })
+end</pre>
+            </div>
+            
+            <h3>HTTPS and SSL</h3>
+            <p>Always use HTTPS for production APIs to encrypt data in transit:</p>
+            
+            <div class="code-example">
+                <pre>require 'sinatra'
+require 'webrick/https'
+require 'openssl'
+
+# SSL certificate and key
+webrick_options = {
+  :Port               => 8443,
+  :SSLEnable          => true,
+  :SSLVerifyClient    => OpenSSL::SSL::VERIFY_NONE,
+  :SSLCertificate     => OpenSSL::X509::Certificate.new(File.read("cert.pem")),
+  :SSLPrivateKey      => OpenSSL::PKey::RSA.new(File.read("key.pem")),
+  :SSLCertName        => [["CN", WEBrick::Utils::getservername]]
+}
+
+# Start Sinatra with HTTPS
+Rack::Handler::WEBrick.run Sinatra::Application, webrick_options</pre>
+            </div>
+            
+            <h3>Input Validation and Sanitization</h3>
+            <p>Always validate and sanitize input to protect against injection attacks:</p>
+            
+            <div class="code-example">
+                <pre>require 'sinatra'
+require 'sinatra/json'
+require 'json-schema'
+
+# JSON Schema for request validation
+USER_SCHEMA = {
+  "type" => "object",
+  "required" => ["name", "email"],
+  "properties" => {
+    "name" => { "type" => "string", "minLength" => 2 },
+    "email" => { "type" => "string", "format" => "email" },
+    "age" => { "type" => "integer", "minimum" => 0 }
+  }
+}
+
+post '/api/users' do
+  begin
+    # Parse request body
+    payload = JSON.parse(request.body.read)
+    
+    # Validate against schema
+    JSON::Validator.validate!(USER_SCHEMA, payload)
+    
+    # Process the validated data
+    # ...
+    
+    status 201
+    json({ message: 'User created' })
+  rescue JSON::Schema::ValidationError => e
+    status 400
+    json({ error: 'Validation failed', details: e.message })
+  rescue JSON::ParserError
+    status 400
+    json({ error: 'Invalid JSON' })
+  end
+end</pre>
+            </div>
+            
+            <h3>Rate Limiting</h3>
+            <p>Protect your API from abuse by implementing rate limiting:</p>
+            
+            <div class="code-example">
+                <pre>require 'sinatra'
+require 'sinatra/json'
+require 'redis'
+
+# Connect to Redis
+redis = Redis.new
+
+# Rate limiting middleware
+before do
+  client_ip = request.ip
+  request_count_key = "rate_limit:#{client_ip}:requests"
+  window_start_key = "rate_limit:#{client_ip}:window_start"
+  
+  # Configuration
+  max_requests = 100  # Maximum requests allowed in the window
+  window_size = 3600  # Window size in seconds (1 hour)
+  
+  # Get current window start time
+  current_time = Time.now.to_i
+  window_start = redis.get(window_start_key)&.to_i || current_time
+  
+  # Reset window if expired
+  if current_time - window_start > window_size
+    redis.set(window_start_key, current_time)
+    redis.set(request_count_key, 0)
+    window_start = current_time
+  end
+  
+  # Get current request count
+  request_count = redis.get(request_count_key)&.to_i || 0
+  
+  # Check if rate limit exceeded
+  if request_count >= max_requests
+    # Calculate time remaining in window
+    reset_time = window_start + window_size
+    retry_after = reset_time - current_time
+    
+    # Set rate limit headers
+    headers['X-RateLimit-Limit'] = max_requests.to_s
+    headers['X-RateLimit-Remaining'] = '0'
+    headers['X-RateLimit-Reset'] = reset_time.to_s
+    headers['Retry-After'] = retry_after.to_s
+    
+    # Return rate limit error
+    halt 429, json({ error: 'Rate limit exceeded' })
+  end
+  
+  # Increment request count
+  redis.incr(request_count_key)
+  
+  # Set rate limit headers
+  headers['X-RateLimit-Limit'] = max_requests.to_s
+  headers['X-RateLimit-Remaining'] = (max_requests - request_count - 1).to_s
+  headers['X-RateLimit-Reset'] = (window_start + window_size).to_s
+end</pre>
+            </div>
+            
+            <h3>Security Best Practices</h3>
+            <ul>
+                <li>Keep dependencies updated to avoid vulnerabilities</li>
+                <li>Use prepared statements for database queries to prevent SQL injection</li>
+                <li>Implement proper CORS (Cross-Origin Resource Sharing) policies</li>
+                <li>Use secure HTTP headers (Content-Security-Policy, X-XSS-Protection, etc.)</li>
+                <li>Don't expose sensitive information in error messages</li>
+                <li>Implement logging for security events</li>
+                <li>Use environment variables for sensitive configuration</li>
+            </ul>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Secure API Authentication System</h4>
+                <p>Build a secure authentication system for your Sinatra API:</p>
+                <ol>
+                    <li>Implement user registration with password hashing (using bcrypt)</li>
+                    <li>Create login endpoints that issue JWT tokens</li>
+                    <li>Implement token refresh mechanism</li>
+                    <li>Add role-based authorization (admin, regular user)</li>
+                    <li>Implement rate limiting to prevent brute force attacks</li>
+                    <li>Add proper validation for all user inputs</li>
+                    <li>Implement secure password reset functionality</li>
+                    <li>Create middleware to verify and decode tokens</li>
+                    <li>Document security features and best practices in a README</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Building APIs with Sinatra</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

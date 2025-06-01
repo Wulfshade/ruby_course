@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5: Object-Oriented Ruby - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Object-Oriented Ruby</h1>
+        <p>Dive into Ruby's object-oriented features</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">Classes and Objects</button>
+                <button class="topic-btn" data-target="topic2">Inheritance</button>
+                <button class="topic-btn" data-target="topic3">Modules and Mixins</button>
+                <button class="topic-btn" data-target="topic4">Encapsulation and Polymorphism</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>Classes and Objects</h2>
+            
+            <h3>Creating Classes</h3>
+            <p>In Ruby, everything is an object. Classes are the blueprints for creating objects.</p>
+            
+            <div class="code-example">
+                <pre># Basic class definition
+class Person
+  # Constructor method
+  def initialize(name, age)
+    @name = name
+    @age = age
+  end
+  
+  # Instance method
+  def introduce
+    "Hello, I'm #{@name} and I'm #{@age} years old."
+  end
+end
+
+# Creating objects (instances of the class)
+alice = Person.new("Alice", 30)
+bob = Person.new("Bob", 25)
+
+puts alice.introduce  # => "Hello, I'm Alice and I'm 30 years old."
+puts bob.introduce    # => "Hello, I'm Bob and I'm 25 years old."</pre>
+            </div>
+            
+            <h3>Instance Variables</h3>
+            <p>Instance variables (prefixed with <code>@</code>) store object state and are private to the object.</p>
+            
+            <div class="code-example">
+                <pre>class Car
+  def initialize(make, model)
+    @make = make
+    @model = model
+    @speed = 0
+  end
+  
+  def accelerate(amount)
+    @speed += amount
+    "The #{@make} #{@model} accelerates to #{@speed} mph."
+  end
+  
+  def brake(amount)
+    @speed = [@speed - amount, 0].max
+    "The #{@make} #{@model} slows down to #{@speed} mph."
+  end
+end
+
+tesla = Car.new("Tesla", "Model 3")
+puts tesla.accelerate(30)  # => "The Tesla Model 3 accelerates to 30 mph."
+puts tesla.accelerate(20)  # => "The Tesla Model 3 accelerates to 50 mph."
+puts tesla.brake(15)       # => "The Tesla Model 3 slows down to 35 mph."</pre>
+            </div>
+            
+            <h3>Attribute Methods</h3>
+            <p>Ruby provides special methods to create getters and setters for instance variables:</p>
+            
+            <div class="code-example">
+                <pre>class Person
+  # Creates getter methods for name and age
+  attr_reader :name, :age
+  
+  # Creates setter methods for name and age
+  attr_writer :name, :age
+  
+  # Alternatively, create both getters and setters at once
+  # attr_accessor :name, :age
+  
+  def initialize(name, age)
+    @name = name
+    @age = age
+  end
+end
+
+person = Person.new("Alice", 30)
+puts person.name  # => "Alice" (getter)
+person.name = "Alicia"  # setter
+puts person.name  # => "Alicia"</pre>
+            </div>
+            
+            <h3>Instance Methods vs. Class Methods</h3>
+            
+            <div class="code-example">
+                <pre>class MathHelper
+  # Instance method - called on instances of the class
+  def square(number)
+    number * number
+  end
+  
+  # Class method - called on the class itself
+  def self.square_root(number)
+    Math.sqrt(number)
+  end
+end
+
+# Using instance method
+helper = MathHelper.new
+puts helper.square(4)  # => 16
+
+# Using class method
+puts MathHelper.square_root(16)  # => 4.0</pre>
+            </div>
+            
+            <h3>Constants and Class Variables</h3>
+            
+            <div class="code-example">
+                <pre>class Temperature
+  # Constant - available to all instances, conventionally uppercase
+  FREEZING_POINT = 32
+  
+  # Class variable - shared among all instances
+  @@count = 0
+  
+  def initialize(fahrenheit)
+    @fahrenheit = fahrenheit
+    @@count += 1
+  end
+  
+  def self.count
+    @@count
+  end
+  
+  def self.freezing_point
+    FREEZING_POINT
+  end
+end
+
+temp1 = Temperature.new(75)
+temp2 = Temperature.new(28)
+
+puts Temperature.count          # => 2
+puts Temperature.freezing_point # => 32</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Bank Account System</h4>
+                <p>Create a Ruby program that:</p>
+                <ol>
+                    <li>Defines a <code>BankAccount</code> class with:
+                        <ul>
+                            <li>Instance variables for account number, owner name, and balance</li>
+                            <li>Methods for deposit, withdrawal, and checking balance</li>
+                            <li>A method to display account information</li>
+                        </ul>
+                    </li>
+                    <li>Creates different accounts and performs various operations</li>
+                    <li>Ensures that withdrawals cannot exceed the available balance</li>
+                    <li>Keeps track of the total number of accounts created</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('bank-account-system', event)">Show Solution</button>
+                <div id="bank-account-system" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 5: Mini Project - Bank Account System
+
+class BankAccount
+  # Class variable to track the total number of accounts
+  @@account_count = 0
+  
+  # Class method to get the total number of accounts
+  def self.total_accounts
+    @@account_count
+  end
+  
+  # Getter methods for instance variables
+  attr_reader :account_number, :owner_name
+  
+  # Initialize a new bank account
+  def initialize(account_number, owner_name, initial_balance = 0)
+    @account_number = account_number
+    @owner_name = owner_name
+    @balance = initial_balance
+    
+    # Increment the account counter when a new account is created
+    @@account_count += 1
+    
+    puts "Account ##{@account_number} created for #{@owner_name}."
+  end
+  
+  # Get the current balance
+  def balance
+    @balance
+  end
+  
+  # Deposit money into the account
+  def deposit(amount)
+    if amount <= 0
+      puts "Error: Deposit amount must be positive."
+      return false
+    end
+    
+    @balance += amount
+    puts "$#{amount} deposited to account ##{@account_number}."
+    puts "New balance: $#{@balance}"
+    true
+  end
+  
+  # Withdraw money from the account
+  def withdraw(amount)
+    if amount <= 0
+      puts "Error: Withdrawal amount must be positive."
+      return false
+    end
+    
+    if amount > @balance
+      puts "Error: Insufficient funds. Current balance: $#{@balance}"
+      return false
+    end
+    
+    @balance -= amount
+    puts "$#{amount} withdrawn from account ##{@account_number}."
+    puts "New balance: $#{@balance}"
+    true
+  end
+  
+  # Display account information
+  def display_info
+    puts "\n===== Account Information ====="
+    puts "Account Number: #{@account_number}"
+    puts "Owner: #{@owner_name}"
+    puts "Current Balance: $#{@balance}"
+    puts "==============================\n"
+  end
+  
+  # Transfer funds to another account
+  def transfer(target_account, amount)
+    if self.withdraw(amount)
+      target_account.deposit(amount)
+      puts "Transfer of $#{amount} from account ##{@account_number} to account ##{target_account.account_number} successful."
+      true
+    else
+      puts "Transfer failed."
+      false
+    end
+  end
+end
+
+# Test the BankAccount class
+puts "===== Bank Account System Demo ====="
+
+# Create some accounts
+account1 = BankAccount.new("1001", "Alice Smith", 1000)
+account2 = BankAccount.new("1002", "Bob Johnson", 500)
+account3 = BankAccount.new("1003", "Charlie Brown")
+
+# Display initial account information
+account1.display_info
+account2.display_info
+account3.display_info
+
+# Perform some operations
+puts "\n===== Performing Transactions ====="
+account1.deposit(250)
+account2.withdraw(200)
+
+# Try withdrawing too much
+puts "\n===== Testing Error Handling ====="
+account3.withdraw(100)  # Should fail because the initial balance is 0
+
+# Deposit and then withdraw
+account3.deposit(300)
+account3.withdraw(150)
+
+# Transfer between accounts
+puts "\n===== Testing Transfers ====="
+account1.transfer(account2, 300)
+
+# Display updated account information
+puts "\n===== Updated Account Information ====="
+account1.display_info
+account2.display_info
+account3.display_info
+
+# Display total accounts created
+puts "Total number of accounts created: #{BankAccount.total_accounts}"</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Inheritance →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Inheritance</h2>
+            
+            <h3>Class Inheritance</h3>
+            <p>Inheritance allows a class to inherit behavior from another class. The inheriting class is called a subclass, and the class it inherits from is called a superclass.</p>
+            
+            <div class="code-example">
+                <pre>class Animal
+  def initialize(name)
+    @name = name
+  end
+  
+  def speak
+    "#{@name} makes a noise."
+  end
+end
+
+class Dog < Animal
+  def speak
+    "#{@name} barks!"
+  end
+end
+
+class Cat < Animal
+  def speak
+    "#{@name} meows!"
+  end
+end
+
+animal = Animal.new("Unknown")
+dog = Dog.new("Rex")
+cat = Cat.new("Whiskers")
+
+puts animal.speak    # => "Unknown makes a noise."
+puts dog.speak       # => "Rex barks!"
+puts cat.speak       # => "Whiskers meows!"</pre>
+            </div>
+            
+            <h3>The super Keyword</h3>
+            <p>The <code>super</code> keyword calls the method with the same name in the parent class.</p>
+            
+            <div class="code-example">
+                <pre>class Animal
+  def initialize(name)
+    @name = name
+  end
+  
+  def speak
+    "#{@name} makes a noise."
+  end
+end
+
+class Dog < Animal
+  def initialize(name, breed)
+    super(name)  # Call Animal's initialize method
+    @breed = breed
+  end
+  
+  def speak
+    "#{@name} (a #{@breed}) says: " + super
+  end
+end
+
+dog = Dog.new("Rex", "Labrador")
+puts dog.speak  # => "Rex (a Labrador) says: Rex makes a noise."</pre>
+            </div>
+            
+            <h3>Checking Inheritance</h3>
+            
+            <div class="code-example">
+                <pre>class Animal; end
+class Dog < Animal; end
+class Cat < Animal; end
+
+dog = Dog.new
+cat = Cat.new
+
+# Checking if an object is an instance of a class
+puts dog.is_a?(Dog)     # => true
+puts dog.is_a?(Animal)  # => true
+puts dog.is_a?(Cat)     # => false
+
+# Checking if a class inherits from another class
+puts Dog.superclass     # => Animal
+puts Animal.superclass  # => Object
+puts Object.superclass  # => BasicObject</pre>
+            </div>
+            
+            <h3>Method Lookup Chain</h3>
+            <p>When you call a method on an object, Ruby searches for the method in the following order:</p>
+            <ol>
+                <li>The object's class</li>
+                <li>Modules included in the class (in reverse order of inclusion)</li>
+                <li>The superclass</li>
+                <li>Modules included in the superclass</li>
+                <li>And so on up the inheritance chain</li>
+            </ol>
+            
+            <div class="code-example">
+                <pre>class A
+  def who_am_i
+    "I am A"
+  end
+end
+
+class B < A
+  # No who_am_i method defined
+end
+
+class C < B
+  def who_am_i
+    "I am C"
+  end
+end
+
+puts A.new.who_am_i  # => "I am A"
+puts B.new.who_am_i  # => "I am A" (inherited from A)
+puts C.new.who_am_i  # => "I am C" (defined in C)</pre>
+            </div>
+            
+            <h3>Single Inheritance</h3>
+            <p>Ruby supports only single inheritance, meaning a class can inherit from only one superclass. To overcome this limitation, Ruby provides modules and mixins.</p>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Vehicle Hierarchy</h4>
+                <p>Create a Ruby program that:</p>
+                <ol>
+                    <li>Defines a <code>Vehicle</code> base class with:
+                        <ul>
+                            <li>Common attributes like make, model, year</li>
+                            <li>Methods for starting, stopping, and displaying info</li>
+                        </ul>
+                    </li>
+                    <li>Creates subclasses for different vehicle types:
+                        <ul>
+                            <li><code>Car</code> with attributes like number of doors, fuel type</li>
+                            <li><code>Motorcycle</code> with attributes like engine size, type</li>
+                            <li><code>Truck</code> with attributes like cargo capacity, number of axles</li>
+                        </ul>
+                    </li>
+                    <li>Demonstrates inheritance by creating instances and calling methods</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('vehicle-hierarchy', event)">Show Solution</button>
+                <div id="vehicle-hierarchy" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 5: Mini Project - Vehicle Hierarchy
+
+# Base Vehicle class
+class Vehicle
+  attr_reader :make, :model, :year
+  
+  def initialize(make, model, year)
+    @make = make
+    @model = model
+    @year = year
+    @running = false
+  end
+  
+  def start
+    if @running
+      puts "#{full_name} is already running."
+    else
+      @running = true
+      puts "#{full_name} started."
+    end
+  end
+  
+  def stop
+    if @running
+      @running = false
+      puts "#{full_name} stopped."
+    else
+      puts "#{full_name} is already stopped."
+    end
+  end
+  
+  def running?
+    @running
+  end
+  
+  def full_name
+    "#{@year} #{@make} #{@model}"
+  end
+  
+  def display_info
+    puts "\n===== Vehicle Information ====="
+    puts "Type: #{self.class.name}"
+    puts "Make: #{@make}"
+    puts "Model: #{@model}"
+    puts "Year: #{@year}"
+    puts "Status: #{@running ? 'Running' : 'Stopped'}"
+  end
+end
+
+# Car subclass
+class Car < Vehicle
+  attr_reader :doors, :fuel_type
+  
+  def initialize(make, model, year, doors, fuel_type)
+    # Call the parent class's initialize method
+    super(make, model, year)
+    
+    # Add car-specific attributes
+    @doors = doors
+    @fuel_type = fuel_type
+  end
+  
+  def display_info
+    # Call the parent method first
+    super
+    
+    # Add car-specific info
+    puts "Doors: #{@doors}"
+    puts "Fuel Type: #{@fuel_type}"
+  end
+  
+  def honk
+    puts "#{full_name} honks: Beep! Beep!"
+  end
+end
+
+# Motorcycle subclass
+class Motorcycle < Vehicle
+  attr_reader :engine_size, :type
+  
+  def initialize(make, model, year, engine_size, type)
+    # Call the parent class's initialize method
+    super(make, model, year)
+    
+    # Add motorcycle-specific attributes
+    @engine_size = engine_size  # in cc
+    @type = type  # sport, cruiser, touring, etc.
+  end
+  
+  def display_info
+    # Call the parent method first
+    super
+    
+    # Add motorcycle-specific info
+    puts "Engine Size: #{@engine_size}cc"
+    puts "Type: #{@type}"
+  end
+  
+  def wheelie
+    if running?
+      puts "#{full_name} pops a wheelie!"
+    else
+      puts "Can't do a wheelie while the motorcycle is stopped."
+    end
+  end
+end
+
+# Truck subclass
+class Truck < Vehicle
+  attr_reader :cargo_capacity, :axles
+  
+  def initialize(make, model, year, cargo_capacity, axles)
+    # Call the parent class's initialize method
+    super(make, model, year)
+    
+    # Add truck-specific attributes
+    @cargo_capacity = cargo_capacity  # in tons
+    @axles = axles
+  end
+  
+  def display_info
+    # Call the parent method first
+    super
+    
+    # Add truck-specific info
+    puts "Cargo Capacity: #{@cargo_capacity} tons"
+    puts "Number of Axles: #{@axles}"
+  end
+  
+  def load_cargo(weight)
+    if weight > @cargo_capacity
+      puts "Cannot load #{weight} tons. Exceeds capacity of #{@cargo_capacity} tons."
+    else
+      puts "Loaded #{weight} tons of cargo onto the #{full_name}."
+    end
+  end
+end
+
+# Demonstrate the vehicle hierarchy
+puts "===== Vehicle Hierarchy Demo ====="
+
+# Create instances of each vehicle type
+sedan = Car.new("Honda", "Accord", 2023, 4, "Hybrid")
+motorbike = Motorcycle.new("Harley-Davidson", "Street Glide", 2022, 1868, "Touring")
+semi = Truck.new("Peterbilt", "579", 2021, 40, 5)
+
+# Demonstrate vehicle operations
+puts "\n----- Car Operations -----"
+sedan.display_info
+sedan.start
+sedan.honk
+sedan.stop
+
+puts "\n----- Motorcycle Operations -----"
+motorbike.display_info
+motorbike.wheelie  # Should indicate it can't do a wheelie while stopped
+motorbike.start
+motorbike.wheelie  # Now it can do a wheelie
+motorbike.stop
+
+puts "\n----- Truck Operations -----"
+semi.display_info
+semi.start
+semi.load_cargo(30)  # Within capacity
+semi.load_cargo(50)  # Exceeds capacity
+semi.stop
+
+# Show polymorphism
+puts "\n===== Polymorphism Demo ====="
+vehicles = [sedan, motorbike, semi]
+
+puts "Starting all vehicles..."
+vehicles.each do |vehicle|
+  vehicle.start
+end
+
+puts "\nVehicle information:"
+vehicles.each do |vehicle|
+  vehicle.display_info
+  puts ""
+end
+
+puts "Stopping all vehicles..."
+vehicles.each do |vehicle|
+  vehicle.stop
+end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Classes and Objects</button>
+                <button class="btn next-btn">Next: Modules and Mixins →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Modules and Mixins</h2>
+            
+            <h3>Creating Modules</h3>
+            <p>Modules are collections of methods and constants that can be included in classes. They provide a way to share code between classes without using inheritance.</p>
+            
+            <div class="code-example">
+                <pre>module Greetable
+  def greet
+    "Hello, I'm #{@name}!"
+  end
+end
+
+class Person
+  include Greetable
+  
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Robot
+  include Greetable
+  
+  def initialize(name)
+    @name = name
+  end
+end
+
+person = Person.new("Alice")
+robot = Robot.new("R2D2")
+
+puts person.greet  # => "Hello, I'm Alice!"
+puts robot.greet   # => "Hello, I'm R2D2!"</pre>
+            </div>
+            
+            <h3>Mixins</h3>
+            <p>A mixin is a module that's included in a class to add functionality. This is Ruby's way of achieving multiple inheritance.</p>
+            
+            <div class="code-example">
+                <pre>module Swimmable
+  def swim
+    "#{@name} is swimming."
+  end
+end
+
+module Flyable
+  def fly
+    "#{@name} is flying."
+  end
+end
+
+class Bird
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Duck < Bird
+  include Swimmable
+  include Flyable
+end
+
+class Penguin < Bird
+  include Swimmable
+  # Penguins can't fly, so we don't include Flyable
+end
+
+duck = Duck.new("Donald")
+penguin = Penguin.new("Tux")
+
+puts duck.swim     # => "Donald is swimming."
+puts duck.fly      # => "Donald is flying."
+puts penguin.swim  # => "Tux is swimming."
+# penguin.fly would cause an error</pre>
+            </div>
+            
+            <h3>Namespacing with Modules</h3>
+            <p>Modules can be used to organize code and prevent name collisions.</p>
+            
+            <div class="code-example">
+                <pre>module Math
+  class Calculator
+    def self.square(n)
+      n * n
+    end
+  end
+end
+
+module Statistics
+  class Calculator
+    def self.mean(numbers)
+      numbers.sum / numbers.size.to_f
+    end
+  end
+end
+
+puts Math::Calculator.square(5)        # => 25
+puts Statistics::Calculator.mean([1, 2, 3])  # => 2.0</pre>
+            </div>
+            
+            <h3>Module Methods</h3>
+            <p>Modules can define methods that can be called directly on the module.</p>
+            
+            <div class="code-example">
+                <pre>module StringUtils
+  def self.reverse(str)
+    str.reverse
+  end
+  
+  def self.capitalize(str)
+    str.capitalize
+  end
+end
+
+puts StringUtils.reverse("hello")     # => "olleh"
+puts StringUtils.capitalize("ruby")   # => "Ruby"</pre>
+            </div>
+            
+            <h3>The extend Keyword</h3>
+            <p>While <code>include</code> adds methods as instance methods, <code>extend</code> adds them as class methods.</p>
+            
+            <div class="code-example">
+                <pre>module Formatter
+  def format_name
+    @name.upcase
+  end
+end
+
+class Person
+  include Formatter  # Adds format_name as an instance method
+  
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Company
+  extend Formatter  # Adds format_name as a class method
+  
+  @name = "acme corp"
+  
+  def self.display_name
+    format_name
+  end
+end
+
+person = Person.new("alice")
+puts person.format_name      # => "ALICE"
+puts Company.display_name    # => "ACME CORP"</pre>
+            </div>
+            
+            <h3>Using Ruby's Standard Modules</h3>
+            
+            <div class="code-example">
+                <pre>require 'json'
+require 'date'
+
+# Using the JSON module
+hash = { name: "Ruby", age: 30 }
+json_string = JSON.generate(hash)
+puts json_string  # => {"name":"Ruby","age":30}
+puts JSON.parse(json_string)  # => {"name"=>"Ruby", "age"=>30}
+
+# Using the Date module
+today = Date.today
+puts today  # => 2025-05-27
+puts today.year  # => 2025
+puts today.month  # => 5</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Logging System</h4>
+                <p>Create a Ruby program that:</p>
+                <ol>
+                    <li>Defines a <code>Loggable</code> module with methods for:
+                        <ul>
+                            <li>Logging info, warning, and error messages</li>
+                            <li>Timestamping log entries</li>
+                            <li>Formatting log messages</li>
+                        </ul>
+                    </li>
+                    <li>Creates different logger classes for different outputs:
+                        <ul>
+                            <li><code>ConsoleLogger</code> - logs to the console</li>
+                            <li><code>FileLogger</code> - logs to a file</li>
+                        </ul>
+                    </li>
+                    <li>Demonstrates how different classes can include and use the same module</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('logging-system', event)">Show Solution</button>
+                <div id="logging-system" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 5: Mini Project - Logging System
+
+# Loggable module that can be included in any class that needs logging capability
+module Loggable
+  # Log levels
+  LOG_LEVELS = {
+    debug: 0,
+    info: 1,
+    warning: 2,
+    error: 3,
+    fatal: 4
+  }
+  
+  # Set a default minimum log level (can be overridden)
+  def self.included(base)
+    base.class_eval do
+      attr_accessor :min_log_level
+    end
+  end
+  
+  # Format a log message with timestamp and level
+  def format_log_message(level, message)
+    timestamp = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+    "[#{timestamp}] [#{level.to_s.upcase}] #{message}"
+  end
+  
+  # Methods for different log levels
+  def debug(message)
+    log(:debug, message) if should_log?(:debug)
+  end
+  
+  def info(message)
+    log(:info, message) if should_log?(:info)
+  end
+  
+  def warning(message)
+    log(:warning, message) if should_log?(:warning)
+  end
+  
+  def error(message)
+    log(:error, message) if should_log?(:error)
+  end
+  
+  def fatal(message)
+    log(:fatal, message) if should_log?(:fatal)
+  end
+  
+  # Determine if we should log this message based on level
+  def should_log?(level)
+    current_min_level = @min_log_level || :info
+    LOG_LEVELS[level] >= LOG_LEVELS[current_min_level]
+  end
+  
+  # This method should be implemented by the including class
+  def log(level, message)
+    raise NotImplementedError, "Classes including Loggable must implement log method"
+  end
+end
+
+# Console Logger class
+class ConsoleLogger
+  include Loggable
+  
+  def initialize(min_log_level = :info)
+    @min_log_level = min_log_level
+  end
+  
+  # Implement the log method required by Loggable
+  def log(level, message)
+    # Define colors for different log levels
+    colors = {
+      debug: "\e[34m",    # Blue
+      info: "\e[32m",     # Green
+      warning: "\e[33m",  # Yellow
+      error: "\e[31m",    # Red
+      fatal: "\e[35m"     # Magenta
+    }
+    
+    reset_color = "\e[0m"
+    
+    # Print the formatted message to the console with color
+    puts "#{colors[level]}#{format_log_message(level, message)}#{reset_color}"
+  end
+end
+
+# File Logger class
+class FileLogger
+  include Loggable
+  
+  def initialize(filename, min_log_level = :info)
+    @filename = filename
+    @min_log_level = min_log_level
+    
+    # Create or truncate the log file
+    File.open(@filename, "w") do |file|
+      file.puts "=== Log started at #{Time.now} ==="
+    end
+  end
+  
+  # Implement the log method required by Loggable
+  def log(level, message)
+    # Append the formatted message to the log file
+    File.open(@filename, "a") do |file|
+      file.puts format_log_message(level, message)
+    end
+  end
+  
+  # Additional method to view the log content
+  def view_log(lines = 10)
+    if File.exist?(@filename)
+      puts "\nLast #{lines} lines from #{@filename}:"
+      puts "-" * 40
+      
+      # Read the last n lines from the file
+      log_lines = File.readlines(@filename).last(lines)
+      log_lines.each { |line| puts line }
+      
+      puts "-" * 40
+    else
+      puts "Log file does not exist."
+    end
+  end
+end
+
+# Example usage of loggers
+puts "===== Logging System Demo ====="
+
+# Create a console logger with minimum level of debug
+console_logger = ConsoleLogger.new(:debug)
+
+puts "\n----- Console Logger Demo -----"
+console_logger.debug("This is a debug message")
+console_logger.info("User logged in successfully")
+console_logger.warning("Disk space is running low")
+console_logger.error("Failed to connect to database")
+console_logger.fatal("System is shutting down unexpectedly")
+
+# Create a file logger with minimum level of warning
+file_logger = FileLogger.new("application.log", :warning)
+
+puts "\n----- File Logger Demo -----"
+file_logger.debug("This debug message won't be logged due to level filtering")
+file_logger.info("This info message won't be logged due to level filtering")
+file_logger.warning("Database connection is slow")
+file_logger.error("Invalid login attempt")
+file_logger.fatal("Out of memory error")
+
+# View the log file content
+file_logger.view_log
+
+# Example of using logging in an application class
+class UserService
+  include Loggable
+  
+  def initialize(logger)
+    @logger = logger
+  end
+  
+  def log(level, message)
+    @logger.send(level, message)
+  end
+  
+  def create_user(username)
+    info("Attempting to create user: #{username}")
+    
+    # Simulate some business logic
+    if username.nil? || username.empty?
+      error("Failed to create user: username cannot be empty")
+      return false
+    end
+    
+    if username.length < 3
+      warning("Username '#{username}' is too short, but creating anyway")
+    end
+    
+    # User creation "succeeded"
+    info("User '#{username}' created successfully")
+    true
+  end
+end
+
+# Demonstrate using the logging module in an application class
+puts "\n----- Application Class Demo -----"
+user_service = UserService.new(console_logger)
+
+user_service.create_user("")           # Should fail
+user_service.create_user("ab")         # Should warn but succeed
+user_service.create_user("john_doe")   # Should succeed</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Inheritance</button>
+                <button class="btn next-btn">Next: Encapsulation and Polymorphism →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Encapsulation and Polymorphism</h2>
+            
+            <h3>Encapsulation</h3>
+            <p>Encapsulation is the bundling of data and methods that operate on that data within a single unit (class) and restricting access to some of the object's components.</p>
+            
+            <div class="code-example">
+                <pre>class BankAccount
+  def initialize(account_number, balance)
+    @account_number = account_number
+    @balance = balance
+  end
+  
+  # Public methods - the interface to the outside world
+  def deposit(amount)
+    if amount > 0
+      @balance += amount
+      log_transaction("deposit", amount)
+      "Deposited #{amount}. New balance: #{@balance}"
+    else
+      "Invalid deposit amount"
+    end
+  end
+  
+  def withdraw(amount)
+    if amount > 0 && sufficient_funds?(amount)
+      @balance -= amount
+      log_transaction("withdrawal", amount)
+      "Withdrew #{amount}. New balance: #{@balance}"
+    else
+      "Insufficient funds or invalid amount"
+    end
+  end
+  
+  def balance
+    @balance
+  end
+  
+  # Private methods - internal implementation details
+  private
+  
+  def sufficient_funds?(amount)
+    @balance >= amount
+  end
+  
+  def log_transaction(type, amount)
+    # In a real system, this might write to a database or file
+    puts "#{Time.now}: #{type} of #{amount} for account #{@account_number}"
+  end
+end
+
+account = BankAccount.new("12345", 1000)
+puts account.deposit(500)   # => "Deposited 500. New balance: 1500"
+puts account.withdraw(200)  # => "Withdrew 200. New balance: 1300"
+puts account.balance        # => 1300
+
+# This would cause an error because the method is private
+# account.sufficient_funds?(100)</pre>
+            </div>
+            
+            <h3>Polymorphism</h3>
+            <p>Polymorphism allows objects of different classes to respond to the same method call, each in its own way.</p>
+            
+            <div class="code-example">
+                <pre>class Shape
+  def area
+    raise NotImplementedError, "Subclasses must implement area method"
+  end
+  
+  def perimeter
+    raise NotImplementedError, "Subclasses must implement perimeter method"
+  end
+end
+
+class Circle < Shape
+  def initialize(radius)
+    @radius = radius
+  end
+  
+  def area
+    Math::PI * @radius ** 2
+  end
+  
+  def perimeter
+    2 * Math::PI * @radius
+  end
+end
+
+class Rectangle < Shape
+  def initialize(width, height)
+    @width = width
+    @height = height
+  end
+  
+  def area
+    @width * @height
+  end
+  
+  def perimeter
+    2 * (@width + @height)
+  end
+end
+
+class Square < Rectangle
+  def initialize(side)
+    super(side, side)
+  end
+end
+
+# Polymorphic behavior
+shapes = [
+  Circle.new(5),
+  Rectangle.new(4, 6),
+  Square.new(4)
+]
+
+shapes.each do |shape|
+  puts "Area: #{shape.area}, Perimeter: #{shape.perimeter}"
+end
+# Output:
+# Area: 78.53981633974483, Perimeter: 31.41592653589793
+# Area: 24, Perimeter: 20
+# Area: 16, Perimeter: 16</pre>
+            </div>
+            
+            <h3>Duck Typing</h3>
+            <p>Ruby employs "duck typing" - if an object walks like a duck and quacks like a duck, it's treated as a duck. This means that the class of an object is less important than the methods it responds to.</p>
+            
+            <div class="code-example">
+                <pre>class Duck
+  def quack
+    "Quack!"
+  end
+  
+  def swim
+    "Splash!"
+  end
+end
+
+class Person
+  def quack
+    "I'm imitating a duck!"
+  end
+  
+  def swim
+    "I'm swimming like a human."
+  end
+end
+
+class Robot
+  def quack
+    "Beep boop quack!"
+  end
+  
+  def swim
+    "I'm waterproof and floating."
+  end
+end
+
+def make_it_talk_and_swim(duck_like_object)
+  puts duck_like_object.quack
+  puts duck_like_object.swim
+end
+
+make_it_talk_and_swim(Duck.new)
+# Output:
+# Quack!
+# Splash!
+
+make_it_talk_and_swim(Person.new)
+# Output:
+# I'm imitating a duck!
+# I'm swimming like a human.
+
+make_it_talk_and_swim(Robot.new)
+# Output:
+# Beep boop quack!
+# I'm waterproof and floating.</pre>
+            </div>
+            
+            <h3>Method Visibility</h3>
+            <p>Ruby provides three levels of method visibility:</p>
+            
+            <div class="code-example">
+                <pre>class MyClass
+  # Public - can be called by anyone (default)
+  def public_method
+    "This can be called by anyone"
+  end
+  
+  # Protected - can be called by instances of the same class
+  protected
+  
+  def protected_method
+    "This can only be called by other instances of MyClass"
+  end
+  
+  # Private - can only be called within the instance
+  private
+  
+  def private_method
+    "This can only be called from within this instance"
+  end
+  
+  # This method shows how to call protected and private methods
+  public
+  
+  def demonstrate
+    puts public_method
+    puts protected_method
+    puts private_method
+    
+    other = MyClass.new
+    puts other.protected_method  # This works
+    # puts other.private_method  # This would cause an error
+  end
+end
+
+obj = MyClass.new
+obj.demonstrate
+
+# This works
+puts obj.public_method
+
+# These would cause errors
+# puts obj.protected_method
+# puts obj.private_method</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Media Player</h4>
+                <p>Create a Ruby program that:</p>
+                <ol>
+                    <li>Defines a <code>MediaPlayer</code> class as a base class with methods:
+                        <ul>
+                            <li><code>play</code>, <code>pause</code>, <code>stop</code>, <code>next</code>, <code>previous</code></li>
+                        </ul>
+                    </li>
+                    <li>Creates subclasses for different media types:
+                        <ul>
+                            <li><code>AudioPlayer</code></li>
+                            <li><code>VideoPlayer</code></li>
+                            <li><code>StreamingPlayer</code></li>
+                        </ul>
+                    </li>
+                    <li>Demonstrates encapsulation by making some methods private</li>
+                    <li>Demonstrates polymorphism by having each player type implement the play method differently</li>
+                    <li>Creates a <code>PlayerController</code> class that can work with any player type</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('media-player', event)">Show Solution</button>
+                <div id="media-player" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 5: Mini Project - Media Player
+
+# Base MediaPlayer class
+class MediaPlayer
+  attr_reader :name, :current_track, :playlist, :state
+  
+  def initialize(name)
+    @name = name
+    @playlist = []
+    @current_track = nil
+    @current_track_index = 0
+    @state = :stopped  # :playing, :paused, :stopped
+    
+    puts "Created #{@name} media player"
+  end
+  
+  # Add a track to the playlist
+  def add_track(track)
+    @playlist << track
+    puts "Added '#{track}' to #{@name} playlist"
+    
+    # If this is the first track, set it as current
+    @current_track = track if @playlist.size == 1
+  end
+  
+  # Play the current track
+  def play
+    if @playlist.empty?
+      puts "Cannot play: Playlist is empty"
+      return
+    end
+    
+    @state = :playing
+    puts "#{@name} is now playing: #{@current_track}"
+  end
+  
+  # Pause playback
+  def pause
+    if @state == :playing
+      @state = :paused
+      puts "#{@name} paused: #{@current_track}"
+    else
+      puts "Cannot pause: Player is not currently playing"
+    end
+  end
+  
+  # Stop playback
+  def stop
+    @state = :stopped
+    puts "#{@name} stopped"
+  end
+  
+  # Skip to next track
+  def next
+    return puts "Playlist is empty" if @playlist.empty?
+    
+    @current_track_index = (@current_track_index + 1) % @playlist.size
+    @current_track = @playlist[@current_track_index]
+    
+    puts "#{@name} skipped to next track: #{@current_track}"
+    play if @state == :playing  # Continue playing if we were playing
+  end
+  
+  # Go to previous track
+  def previous
+    return puts "Playlist is empty" if @playlist.empty?
+    
+    @current_track_index = (@current_track_index - 1) % @playlist.size
+    @current_track = @playlist[@current_track_index]
+    
+    puts "#{@name} went back to previous track: #{@current_track}"
+    play if @state == :playing  # Continue playing if we were playing
+  end
+  
+  # Display current status of the player
+  def status
+    puts "\n----- #{@name} Status -----"
+    puts "State: #{@state}"
+    puts "Current Track: #{@current_track || 'None'}"
+    puts "Playlist (#{@playlist.size} tracks): #{@playlist.join(', ')}"
+    puts ""
+  end
+  
+  private
+  
+  # Reset the player
+  def reset
+    @current_track_index = 0
+    @current_track = @playlist.first
+    @state = :stopped
+  end
+  
+  # This method will be implemented by subclasses
+  def prepare_playback
+    raise NotImplementedError, "#{self.class} must implement prepare_playback"
+  end
+end
+
+# AudioPlayer subclass
+class AudioPlayer < MediaPlayer
+  attr_reader :volume, :equalizer_settings
+  
+  def initialize(name)
+    super(name)
+    @volume = 50  # 0-100
+    @equalizer_settings = { bass: 0, mid: 0, treble: 0 }  # -10 to +10
+  end
+  
+  # Override play to add audio-specific behavior
+  def play
+    prepare_playback
+    super
+    puts "Playing audio with volume: #{@volume}%"
+  end
+  
+  # Set volume
+  def set_volume(level)
+    if level < 0 || level > 100
+      puts "Volume must be between 0 and 100"
+    else
+      @volume = level
+      puts "#{@name} volume set to #{@volume}%"
+    end
+  end
+  
+  # Adjust equalizer
+  def adjust_equalizer(bass: nil, mid: nil, treble: nil)
+    @equalizer_settings[:bass] = bass if bass
+    @equalizer_settings[:mid] = mid if mid
+    @equalizer_settings[:treble] = treble if treble
+    
+    puts "Equalizer settings: Bass: #{@equalizer_settings[:bass]}, "\
+         "Mid: #{@equalizer_settings[:mid]}, "\
+         "Treble: #{@equalizer_settings[:treble]}"
+  end
+  
+  private
+  
+  # Implement the required method
+  def prepare_playback
+    puts "Preparing audio codec and optimizing for music playback"
+  end
+end
+
+# VideoPlayer subclass
+class VideoPlayer < MediaPlayer
+  attr_reader :resolution, :subtitles_enabled
+  
+  def initialize(name)
+    super(name)
+    @resolution = "1080p"  # Default resolution
+    @subtitles_enabled = false
+  end
+  
+  # Override play to add video-specific behavior
+  def play
+    prepare_playback
+    super
+    puts "Playing video at #{@resolution} resolution"
+    puts "Subtitles are #{@subtitles_enabled ? 'enabled' : 'disabled'}"
+  end
+  
+  # Set resolution
+  def set_resolution(resolution)
+    valid_resolutions = ["480p", "720p", "1080p", "4K"]
+    
+    if valid_resolutions.include?(resolution)
+      @resolution = resolution
+      puts "#{@name} resolution set to #{@resolution}"
+    else
+      puts "Invalid resolution. Choose from: #{valid_resolutions.join(', ')}"
+    end
+  end
+  
+  # Toggle subtitles
+  def toggle_subtitles
+    @subtitles_enabled = !@subtitles_enabled
+    puts "Subtitles #{@subtitles_enabled ? 'enabled' : 'disabled'}"
+  end
+  
+  private
+  
+  # Implement the required method
+  def prepare_playback
+    puts "Preparing video codec and setting up display"
+  end
+end
+
+# StreamingPlayer subclass
+class StreamingPlayer < MediaPlayer
+  attr_reader :streaming_quality, :buffer_size, :connected
+  
+  def initialize(name)
+    super(name)
+    @streaming_quality = "Auto"  # Auto, Low, Medium, High
+    @buffer_size = 5000  # in milliseconds
+    @connected = false
+  end
+  
+  # Connect to streaming service
+  def connect
+    # In a real app, this would handle authentication, etc.
+    @connected = true
+    puts "#{@name} connected to streaming service"
+  end
+  
+  # Disconnect from streaming service
+  def disconnect
+    @connected = false
+    @state = :stopped
+    puts "#{@name} disconnected from streaming service"
+  end
+  
+  # Override play to add streaming-specific behavior
+  def play
+    unless @connected
+      puts "Cannot play: Not connected to streaming service"
+      return
+    end
+    
+    prepare_playback
+    super
+    puts "Streaming at #{@streaming_quality} quality with #{@buffer_size}ms buffer"
+  end
+  
+  # Set streaming quality
+  def set_quality(quality)
+    valid_qualities = ["Auto", "Low", "Medium", "High"]
+    
+    if valid_qualities.include?(quality)
+      @streaming_quality = quality
+      puts "#{@name} streaming quality set to #{@streaming_quality}"
+    else
+      puts "Invalid quality. Choose from: #{valid_qualities.join(', ')}"
+    end
+  end
+  
+  # Adjust buffer size
+  def adjust_buffer(size)
+    if size < 1000 || size > 10000
+      puts "Buffer size must be between 1000 and 10000 ms"
+    else
+      @buffer_size = size
+      puts "#{@name} buffer size set to #{@buffer_size}ms"
+    end
+  end
+  
+  private
+  
+  # Implement the required method
+  def prepare_playback
+    puts "Preparing stream and buffering content"
+  end
+end
+
+# PlayerController class that works with any player type
+class PlayerController
+  def initialize
+    @players = {}
+    @current_player = nil
+  end
+  
+  # Register a player with the controller
+  def register_player(player)
+    @players[player.name] = player
+    @current_player = player if @current_player.nil?
+    puts "Registered #{player.name} with the controller"
+  end
+  
+  # Switch to a different player
+  def switch_to_player(player_name)
+    if @players.has_key?(player_name)
+      @current_player = @players[player_name]
+      puts "Switched to #{player_name}"
+    else
+      puts "Player '#{player_name}' not found"
+    end
+  end
+  
+  # Get the current active player
+  def current_player
+    @current_player
+  end
+  
+  # List all registered players
+  def list_players
+    puts "\n----- Registered Players -----"
+    @players.each do |name, player|
+      puts "#{name} (#{player.class.name}): #{player.state}"
+    end
+    puts ""
+  end
+  
+  # Delegate methods to the current player
+  [:play, :pause, :stop, :next, :previous, :status].each do |method_name|
+    define_method(method_name) do
+      if @current_player.nil?
+        puts "No player selected"
+      else
+        @current_player.send(method_name)
+      end
+    end
+  end
+end
+
+# Demonstrate the media player system
+puts "===== Media Player System Demo ====="
+
+# Create instances of different player types
+audio = AudioPlayer.new("MusicMaster")
+video = VideoPlayer.new("VideoWiz")
+streaming = StreamingPlayer.new("StreamFlix")
+
+# Set up the controller
+controller = PlayerController.new
+controller.register_player(audio)
+controller.register_player(video)
+controller.register_player(streaming)
+
+# Add some tracks to each player
+audio.add_track("Bohemian Rhapsody - Queen")
+audio.add_track("Hey Jude - The Beatles")
+audio.add_track("Billie Jean - Michael Jackson")
+
+video.add_track("The Matrix (1999)")
+video.add_track("Inception (2010)")
+
+streaming.add_track("Stranger Things S1E1")
+streaming.add_track("Breaking Bad S1E1")
+streaming.connect()
+
+# List all players
+controller.list_players
+
+# Control the audio player
+puts "\n----- Audio Player Demo -----"
+controller.switch_to_player("MusicMaster")
+controller.play
+audio.set_volume(75)
+audio.adjust_equalizer(bass: 3, treble: 2)
+controller.next
+controller.status
+
+# Control the video player
+puts "\n----- Video Player Demo -----"
+controller.switch_to_player("VideoWiz")
+controller.play
+video.set_resolution("4K")
+video.toggle_subtitles
+controller.status
+
+# Control the streaming player
+puts "\n----- Streaming Player Demo -----"
+controller.switch_to_player("StreamFlix")
+controller.play
+streaming.set_quality("High")
+streaming.adjust_buffer(8000)
+controller.next
+controller.status
+
+# Demonstrate polymorphism by calling the same method on different players
+puts "\n===== Polymorphism Demo ====="
+players = [audio, video, streaming]
+
+players.each do |player|
+  puts "\nControlling: #{player.name} (#{player.class.name})"
+  player.stop if player.state != :stopped
+  player.play
+  player.pause
+  player.stop
+end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Modules and Mixins</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

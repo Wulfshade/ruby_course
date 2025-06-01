@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Collections - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Collections</h1>
+        <p>Work with Ruby's powerful collection types</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">Arrays</button>
+                <button class="topic-btn" data-target="topic2">Hashes</button>
+                <button class="topic-btn" data-target="topic3">Sets</button>
+                <button class="topic-btn" data-target="topic4">Collection Methods</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>Arrays</h2>
+            
+            <h3>Creating Arrays</h3>
+            <p>Arrays are ordered collections that can hold objects of any type.</p>
+            
+            <div class="code-example">
+                <pre># Empty array
+empty_array = []
+
+# Array with elements
+numbers = [1, 2, 3, 4, 5]
+mixed = [1, "two", :three, 4.0, [5, 6]]
+
+# Array constructor
+Array.new      # => []
+Array.new(3)   # => [nil, nil, nil]
+Array.new(3, 0)  # => [0, 0, 0]
+
+# Be careful with default values that are objects
+# This creates ONE array referenced by all elements:
+wrong = Array.new(3, [])  # => [[], [], []]
+wrong[0] << "a"  # => ["a"]
+wrong  # => [["a"], ["a"], ["a"]]
+
+# Instead, use a block to create unique objects:
+right = Array.new(3) { [] }  # => [[], [], []]
+right[0] << "a"  # => ["a"]
+right  # => [["a"], [], []]
+
+# Creating arrays from other objects
+"a,b,c".split(",")  # => ["a", "b", "c"]
+"hello".chars       # => ["h", "e", "l", "l", "o"]
+(1..5).to_a         # => [1, 2, 3, 4, 5]</pre>
+            </div>
+            
+            <h3>Accessing Elements</h3>
+            <p>Ruby arrays are zero-indexed, meaning the first element is at position 0.</p>
+            
+            <div class="code-example">
+                <pre>fruits = ["apple", "banana", "cherry", "date", "elderberry"]
+
+# Access by index
+fruits[0]    # => "apple"
+fruits[1]    # => "banana"
+fruits[-1]   # => "elderberry" (negative indexes count from the end)
+fruits[-2]   # => "date"
+
+# Access by range
+fruits[1..3]   # => ["banana", "cherry", "date"] (inclusive range)
+fruits[1...3]  # => ["banana", "cherry"] (exclusive range)
+
+# at method
+fruits.at(0)   # => "apple"
+
+# first and last
+fruits.first   # => "apple"
+fruits.last    # => "elderberry"
+
+# fetch with default value (prevents nil for out-of-bounds)
+fruits.fetch(10, "not found")  # => "not found"
+
+# values_at for multiple indices
+fruits.values_at(0, 2, 4)  # => ["apple", "cherry", "elderberry"]</pre>
+            </div>
+            
+            <h3>Modifying Arrays</h3>
+            
+            <div class="code-example">
+                <pre>fruits = ["apple", "banana", "cherry"]
+
+# Adding elements
+fruits.push("date")          # => ["apple", "banana", "cherry", "date"]
+fruits << "elderberry"       # => ["apple", "banana", "cherry", "date", "elderberry"]
+fruits.unshift("apricot")    # => ["apricot", "apple", "banana", "cherry", "date", "elderberry"]
+fruits.insert(3, "blueberry") # => ["apricot", "apple", "banana", "blueberry", "cherry", "date", "elderberry"]
+
+# Removing elements
+fruits.pop        # => "elderberry", fruits is now ["apricot", "apple", "banana", "blueberry", "cherry", "date"]
+fruits.shift      # => "apricot", fruits is now ["apple", "banana", "blueberry", "cherry", "date"]
+fruits.delete_at(2) # => "blueberry", fruits is now ["apple", "banana", "cherry", "date"]
+fruits.delete("cherry") # => "cherry", fruits is now ["apple", "banana", "date"]
+
+# Setting elements
+fruits[1] = "blackberry"  # => ["apple", "blackberry", "date"]
+
+# Removing nil values
+[1, nil, 2, nil, 3].compact  # => [1, 2, 3]
+
+# Removing duplicates
+[1, 2, 2, 3, 3, 3].uniq  # => [1, 2, 3]</pre>
+            </div>
+            
+            <h3>Array Methods</h3>
+            
+            <div class="code-example">
+                <pre>numbers = [1, 2, 3, 4, 5]
+
+# Basic information
+numbers.length  # => 5
+numbers.size    # => 5
+numbers.empty?  # => false
+numbers.include?(3)  # => true
+
+# Transformations
+numbers.reverse  # => [5, 4, 3, 2, 1]
+numbers.sort     # => [1, 2, 3, 4, 5] (unnecessary here, but useful for unsorted arrays)
+["a", "b", "c"].join("-")  # => "a-b-c"
+
+# Destructive methods (with !)
+numbers.reverse!  # => [5, 4, 3, 2, 1] (and numbers is now [5, 4, 3, 2, 1])
+numbers.sort!     # => [1, 2, 3, 4, 5] (and numbers is now [1, 2, 3, 4, 5])</pre>
+            </div>
+            
+            <h3>Multi-dimensional Arrays</h3>
+            
+            <div class="code-example">
+                <pre># 2D array (matrix)
+matrix = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+]
+
+# Accessing elements in a 2D array
+matrix[1][2]  # => 6 (middle row, last column)</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Todo List</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Initializes an empty array to store todo items</li>
+                    <li>Implements functions to:
+                        <ul>
+                            <li>Add a new todo item (with priority: high, medium, low)</li>
+                            <li>Mark a todo item as complete</li>
+                            <li>Remove a todo item</li>
+                            <li>List all todo items (sorted by priority)</li>
+                        </ul>
+                    </li>
+                    <li>Provides a simple command-line interface to use these functions</li>
+                </ol>
+                <p>Hint: Consider using an array of hashes to store each todo item with its properties.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('todo-list', event)">Show Solution</button>
+                <div id="todo-list" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 3: Mini Project - Todo List
+
+# Initialize an empty array to store todo items
+todos = []  # Each todo will be a hash with title, priority, and completed status
+
+# Function to add a new todo item with priority
+def add_todo(todos, title, priority = "medium")
+  # Validate priority
+  valid_priorities = ["high", "medium", "low"]
+  if !valid_priorities.include?(priority.downcase)
+    puts "Invalid priority! Using 'medium' as default."
+    priority = "medium"
+  end
+  
+  # Create the todo item hash
+  todo = {
+    title: title,
+    priority: priority.downcase,
+    completed: false
+  }
+  
+  # Add to array and return the updated array
+  todos << todo
+  puts "Added todo: '#{title}' with #{priority} priority."
+  return todos
+end
+
+# Function to mark a todo item as complete by index
+def complete_todo(todos, index)
+  if index >= 0 && index < todos.length
+    todos[index][:completed] = true
+    puts "Marked '#{todos[index][:title]}' as complete."
+  else
+    puts "Invalid todo index!"
+  end
+  return todos
+end
+
+# Function to remove a todo item by index
+def remove_todo(todos, index)
+  if index >= 0 && index < todos.length
+    removed_todo = todos.delete_at(index)
+    puts "Removed todo: '#{removed_todo[:title]}'"
+  else
+    puts "Invalid todo index!"
+  end
+  return todos
+end
+
+# Function to list all todos, sorted by priority
+def list_todos(todos)
+  if todos.empty?
+    puts "No todos found."
+    return
+  end
+
+  # Sort by priority (high, medium, low)
+  priority_order = {"high" => 1, "medium" => 2, "low" => 3}
+  sorted_todos = todos.sort_by { |todo| priority_order[todo[:priority]] }
+  
+  puts "\n===== TODO LIST =====\n"
+  sorted_todos.each_with_index do |todo, index|
+    status = todo[:completed] ? "[✓]" : "[ ]"
+    puts "#{index}. #{status} #{todo[:title]} (#{todo[:priority]} priority)"
+  end
+  puts "\n===================\n"
+end
+
+# Main program with command-line interface
+puts "Welcome to the Ruby Todo List!"
+puts "--------------------------------"
+
+while true
+  puts "\nWhat would you like to do?"
+  puts "1. Add a new todo"
+  puts "2. Mark a todo as complete"
+  puts "3. Remove a todo"
+  puts "4. List all todos"
+  puts "5. Exit"
+  
+  print "Enter your choice (1-5): "
+  choice = gets.chomp.to_i
+  
+  case choice
+  when 1
+    print "Enter todo title: "
+    title = gets.chomp
+    print "Enter priority (high/medium/low): "
+    priority = gets.chomp
+    todos = add_todo(todos, title, priority)
+    
+  when 2
+    list_todos(todos)
+    print "Enter todo index to complete: "
+    index = gets.chomp.to_i
+    todos = complete_todo(todos, index)
+    
+  when 3
+    list_todos(todos)
+    print "Enter todo index to remove: "
+    index = gets.chomp.to_i
+    todos = remove_todo(todos, index)
+    
+  when 4
+    list_todos(todos)
+    
+  when 5
+    puts "Thank you for using the Ruby Todo List!"
+    break
+    
+  else
+    puts "Invalid choice! Please enter a number between 1 and 5."
+  end
+end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Hashes →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Hashes</h2>
+            
+            <h3>Creating Hashes</h3>
+            <p>Hashes are collections of key-value pairs, similar to dictionaries or maps in other languages.</p>
+            
+            <div class="code-example">
+                <pre># Empty hash
+empty_hash = {}
+
+# Hash with key-value pairs (older syntax)
+person = {"name" => "Alice", "age" => 30, "occupation" => "Developer"}
+
+# Hash with symbol keys (modern syntax)
+person = {name: "Alice", age: 30, occupation: "Developer"}
+
+# Mixed keys (not recommended, but possible)
+mixed = {name: "Alice", "age" => 30, 1 => "one"}
+
+# Hash constructor
+Hash.new          # => {}
+Hash.new(0)       # => {} (with 0 as default value for non-existent keys)
+
+h = Hash.new(0)
+h["a"]            # => 0 (default value)
+h                 # => {} (default value isn't stored)
+
+# Hash constructor with block
+counter = Hash.new { |hash, key| hash[key] = 0 }
+counter["a"] += 1  # => 1
+counter            # => {"a"=>1} (value is stored)</pre>
+            </div>
+            
+            <h3>Accessing Hash Values</h3>
+            
+            <div class="code-example">
+                <pre>person = {name: "Alice", age: 30, occupation: "Developer"}
+
+# Access by key
+person[:name]       # => "Alice"
+person[:occupation] # => "Developer"
+
+# Using fetch (prevents nil for missing keys)
+person.fetch(:salary, "Not specified")  # => "Not specified"
+
+# Check if key exists
+person.key?(:age)       # => true
+person.has_key?(:email) # => false (alias for key?)
+
+# Get all keys or values
+person.keys    # => [:name, :age, :occupation]
+person.values  # => ["Alice", 30, "Developer"]</pre>
+            </div>
+            
+            <h3>Modifying Hashes</h3>
+            
+            <div class="code-example">
+                <pre>person = {name: "Alice", age: 30}
+
+# Adding or updating values
+person[:occupation] = "Developer"  # => "Developer"
+person[:age] = 31                  # => 31
+
+# Now person is {:name=>"Alice", :age=>31, :occupation=>"Developer"}
+
+# Removing key-value pairs
+person.delete(:age)  # => 31
+# Now person is {:name=>"Alice", :occupation=>"Developer"}
+
+# Merging hashes
+person.merge({location: "San Francisco", email: "alice@example.com"})
+# => {:name=>"Alice", :occupation=>"Developer", :location=>"San Francisco", :email=>"alice@example.com"}
+
+# Destructive merge
+person.merge!({location: "San Francisco"})
+# Now person is {:name=>"Alice", :occupation=>"Developer", :location=>"San Francisco"}</pre>
+            </div>
+            
+            <h3>Hash Methods</h3>
+            
+            <div class="code-example">
+                <pre>person = {name: "Alice", age: 30, occupation: "Developer"}
+
+# Basic information
+person.length  # => 3
+person.size    # => 3
+person.empty?  # => false
+
+# Check for values
+person.value?("Alice")  # => true
+person.has_value?(31)   # => false
+
+# Transform to array
+person.to_a  # => [[:name, "Alice"], [:age, 30], [:occupation, "Developer"]]
+
+# Iterate through key-value pairs
+person.each do |key, value|
+  puts "#{key}: #{value}"
+end
+# Output:
+# name: Alice
+# age: 30
+# occupation: Developer
+
+# Filter keys or values
+person.select { |k, v| v.is_a?(String) }  # => {:name=>"Alice", :occupation=>"Developer"}
+person.reject { |k, v| k == :age }        # => {:name=>"Alice", :occupation=>"Developer"}</pre>
+            </div>
+            
+            <h3>Hash as the Last Argument</h3>
+            <p>When a hash is the last argument to a method, the curly braces can be omitted:</p>
+            
+            <div class="code-example">
+                <pre>def configure(options = {})
+  puts "Host: #{options[:host]}"
+  puts "Port: #{options[:port]}"
+end
+
+# These are equivalent:
+configure({host: "localhost", port: 3000})
+configure(host: "localhost", port: 3000)</pre>
+            </div>
+            
+            <h3>Common Hash Uses</h3>
+            
+            <div class="code-example">
+                <pre># As configuration options
+options = {
+  verbose: true,
+  output_path: "/tmp",
+  max_lines: 1000
+}
+
+# As method arguments
+def connect(options = {})
+  host = options[:host] || "localhost"
+  port = options[:port] || 80
+  # ...
+end
+
+# As data structures
+post = {
+  id: 42,
+  title: "Learning Ruby Hashes",
+  author: {
+    name: "Ruby Developer",
+    email: "ruby@example.com"
+  },
+  tags: ["ruby", "programming", "hashes"]
+}</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Address Book</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Implements a simple address book using hashes</li>
+                    <li>Allows users to:
+                        <ul>
+                            <li>Add a new contact (name, phone, email, address)</li>
+                            <li>View a contact's details</li>
+                            <li>Update a contact's information</li>
+                            <li>Delete a contact</li>
+                            <li>List all contacts</li>
+                            <li>Search for contacts by name</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p>Bonus: Save the address book to a file and load it when the program starts.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('address-book', event)">Show Solution</button>
+                <div id="address-book" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 3: Mini Project - Address Book
+
+# Initialize an empty hash to store contacts
+address_book = {}
+
+# Function to add a new contact
+def add_contact(address_book, name, phone, email, address)
+  if address_book.has_key?(name.downcase)
+    puts "A contact with the name '#{name}' already exists."
+    return address_book
+  end
+  
+  # Create contact hash with all details
+  contact = {
+    name: name,
+    phone: phone,
+    email: email,
+    address: address
+  }
+  
+  # Add to address book (using downcased name as key for case-insensitive lookup)
+  address_book[name.downcase] = contact
+  puts "Added contact: #{name}"
+  return address_book
+end
+
+# Function to view a contact's details
+def view_contact(address_book, name)
+  if address_book.has_key?(name.downcase)
+    contact = address_book[name.downcase]
+    puts "\n=== Contact Details ==="
+    puts "Name: #{contact[:name]}"
+    puts "Phone: #{contact[:phone]}"
+    puts "Email: #{contact[:email]}"
+    puts "Address: #{contact[:address]}"
+    puts "====================="
+  else
+    puts "Contact not found: #{name}"
+  end
+end
+
+# Function to update a contact's information
+def update_contact(address_book, name)
+  if address_book.has_key?(name.downcase)
+    contact = address_book[name.downcase]
+    
+    puts "Updating contact: #{contact[:name]}"
+    puts "Press Enter to keep current values."
+    
+    print "Phone (current: #{contact[:phone]}): "
+    new_phone = gets.chomp
+    contact[:phone] = new_phone unless new_phone.empty?
+    
+    print "Email (current: #{contact[:email]}): "
+    new_email = gets.chomp
+    contact[:email] = new_email unless new_email.empty?
+    
+    print "Address (current: #{contact[:address]}): "
+    new_address = gets.chomp
+    contact[:address] = new_address unless new_address.empty?
+    
+    puts "Contact updated successfully!"
+  else
+    puts "Contact not found: #{name}"
+  end
+  
+  return address_book
+end
+
+# Function to delete a contact
+def delete_contact(address_book, name)
+  if address_book.has_key?(name.downcase)
+    address_book.delete(name.downcase)
+    puts "Deleted contact: #{name}"
+  else
+    puts "Contact not found: #{name}"
+  end
+  
+  return address_book
+end
+
+# Function to list all contacts
+def list_contacts(address_book)
+  if address_book.empty?
+    puts "Address book is empty."
+    return
+  end
+  
+  puts "\n=== Address Book ==="
+  address_book.each_value do |contact|
+    puts "#{contact[:name]}: #{contact[:phone]}"
+  end
+  puts "=================\n"
+end
+
+# Function to search for contacts by name
+def search_contacts(address_book, search_term)
+  search_term = search_term.downcase
+  results = []
+  
+  address_book.each_value do |contact|
+    if contact[:name].downcase.include?(search_term)
+      results << contact
+    end
+  end
+  
+  if results.empty?
+    puts "No contacts found matching '#{search_term}'"
+  else
+    puts "\n=== Search Results ==="
+    results.each do |contact|
+      puts "#{contact[:name]}: #{contact[:phone]}"
+    end
+    puts "====================\n"
+  end
+end
+
+# Main program with command-line interface
+puts "Welcome to the Ruby Address Book!"
+puts "------------------------------"
+
+while true
+  puts "\nWhat would you like to do?"
+  puts "1. Add a new contact"
+  puts "2. View a contact's details"
+  puts "3. Update a contact"
+  puts "4. Delete a contact"
+  puts "5. List all contacts"
+  puts "6. Search for contacts"
+  puts "7. Exit"
+  
+  print "Enter your choice (1-7): "
+  choice = gets.chomp.to_i
+  
+  case choice
+  when 1
+    print "Enter name: "
+    name = gets.chomp
+    print "Enter phone number: "
+    phone = gets.chomp
+    print "Enter email: "
+    email = gets.chomp
+    print "Enter address: "
+    address = gets.chomp
+    
+    address_book = add_contact(address_book, name, phone, email, address)
+    
+  when 2
+    print "Enter name to view: "
+    name = gets.chomp
+    view_contact(address_book, name)
+    
+  when 3
+    print "Enter name to update: "
+    name = gets.chomp
+    address_book = update_contact(address_book, name)
+    
+  when 4
+    print "Enter name to delete: "
+    name = gets.chomp
+    address_book = delete_contact(address_book, name)
+    
+  when 5
+    list_contacts(address_book)
+    
+  when 6
+    print "Enter search term: "
+    search_term = gets.chomp
+    search_contacts(address_book, search_term)
+    
+  when 7
+    puts "Thank you for using the Ruby Address Book!"
+    break
+    
+  else
+    puts "Invalid choice! Please enter a number between 1 and 7."
+  end
+end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Arrays</button>
+                <button class="btn next-btn">Next: Sets →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Sets</h2>
+            
+            <h3>Introduction to Sets</h3>
+            <p>A Set is a collection of unique elements with no duplicates. Unlike arrays and hashes, the Set class is not built into Ruby core; it's part of the standard library.</p>
+            
+            <div class="code-example">
+                <pre># First, require the Set library
+require 'set'
+
+# Creating sets
+empty_set = Set.new
+numbers = Set.new([1, 2, 3, 4, 5])
+# Creating a set from an array with duplicates - duplicates are removed
+with_dupes = Set.new([1, 2, 2, 3, 3, 3])  # => #<Set: {1, 2, 3}>
+
+# Alternative syntax
+numbers = [1, 2, 3, 4, 5].to_set</pre>
+            </div>
+            
+            <h3>Basic Set Operations</h3>
+            
+            <div class="code-example">
+                <pre>require 'set'
+
+set = Set.new([1, 2, 3])
+
+# Adding elements
+set.add(4)        # => #<Set: {1, 2, 3, 4}>
+set << 5          # => #<Set: {1, 2, 3, 4, 5}>
+
+# Adding duplicate elements (ignored)
+set.add(3)        # => #<Set: {1, 2, 3, 4, 5}> (no change)
+
+# Removing elements
+set.delete(1)     # => #<Set: {2, 3, 4, 5}>
+
+# Checking membership
+set.include?(3)   # => true
+set.member?(6)    # => false
+
+# Size
+set.size          # => 4</pre>
+            </div>
+            
+            <h3>Set Theory Operations</h3>
+            <p>Sets in Ruby support the standard set theory operations.</p>
+            
+            <div class="code-example">
+                <pre>require 'set'
+
+a = Set.new([1, 2, 3, 4])
+b = Set.new([3, 4, 5, 6])
+
+# Union (elements in either set)
+a | b           # => #<Set: {1, 2, 3, 4, 5, 6}>
+a.union(b)      # => #<Set: {1, 2, 3, 4, 5, 6}>
+
+# Intersection (elements in both sets)
+a & b           # => #<Set: {3, 4}>
+a.intersection(b) # => #<Set: {3, 4}>
+
+# Difference (elements in first set but not in second)
+a - b           # => #<Set: {1, 2}>
+a.difference(b) # => #<Set: {1, 2}>
+
+# Symmetric Difference (elements in either set but not in both)
+a ^ b           # => #<Set: {1, 2, 5, 6}>
+
+# Subset and superset
+small = Set.new([3, 4])
+small.subset?(a)    # => true
+a.superset?(small)  # => true</pre>
+            </div>
+            
+            <h3>Iterating Over Sets</h3>
+            
+            <div class="code-example">
+                <pre>require 'set'
+
+fruits = Set.new(["apple", "banana", "cherry"])
+
+# Each iteration
+fruits.each do |fruit|
+  puts "I like #{fruit}!"
+end
+
+# Mapping to a new set
+uppercase_fruits = fruits.map { |fruit| fruit.upcase }
+# => #<Set: {"APPLE", "BANANA", "CHERRY"}>
+
+# Selecting elements
+b_fruits = fruits.select { |fruit| fruit.start_with?('b') }
+# => #<Set: {"banana"}></pre>
+            </div>
+            
+            <h3>Use Cases for Sets</h3>
+            
+            <div class="code-example">
+                <pre>require 'set'
+
+# Removing duplicates from an array
+unique_numbers = [1, 2, 2, 3, 3, 3].to_set.to_a  # => [1, 2, 3]
+
+# Tracking visited elements
+visited = Set.new
+visited << "page1"
+visited << "page2"
+visited.include?("page1")  # => true
+
+# Efficient membership testing
+valid_options = Set.new(["small", "medium", "large"])
+user_choice = "medium"
+if valid_options.include?(user_choice)
+  puts "Valid choice!"
+end
+
+# Finding unique elements
+text = "hello world"
+unique_chars = Set.new(text.chars)
+# => #<Set: {"h", "e", "l", "o", " ", "w", "r", "d"}>
+puts "#{unique_chars.size} unique characters"  # => 8 unique characters</pre>
+            </div>
+            
+            <h3>SortedSet</h3>
+            <p>Ruby also provides a SortedSet class that keeps its elements sorted.</p>
+            
+            <div class="code-example">
+                <pre>require 'set'
+
+# For sorted set, we need an additional require
+require 'sorted_set'
+
+sorted = SortedSet.new([3, 1, 4, 1, 5, 9, 2, 6, 5])
+# => #<SortedSet: {1, 2, 3, 4, 5, 6, 9}>
+
+# Elements are always kept in order
+sorted << 7
+# => #<SortedSet: {1, 2, 3, 4, 5, 6, 7, 9}>
+
+# This works with any objects that can be compared
+words = SortedSet.new(["banana", "apple", "cherry"])
+# => #<SortedSet: {"apple", "banana", "cherry"}></pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Word Frequency Analyzer</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Reads a text file or accepts a string of text</li>
+                    <li>Identifies all unique words (ignoring case and punctuation)</li>
+                    <li>Counts the frequency of each word</li>
+                    <li>Prints the top 10 most common words and their frequencies</li>
+                    <li>Also prints the number of unique words in the text</li>
+                </ol>
+                <p>Hint: Use a Set to track unique words and a Hash to count frequencies.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('word-frequency-analyzer', event)">Show Solution</button>
+                <div id="word-frequency-analyzer" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 3: Mini Project - Word Frequency Analyzer
+
+require 'set'
+
+# Function to analyze text and return word frequencies
+def analyze_text(text)
+  # Convert text to lowercase and remove punctuation
+  cleaned_text = text.downcase.gsub(/[^a-z0-9\s]/, '')
+  
+  # Split into words
+  words = cleaned_text.split
+  
+  # Create a Set of unique words
+  unique_words = Set.new(words)
+  
+  # Create a Hash to store word frequencies
+  word_counts = {}
+  
+  # Count word frequencies
+  words.each do |word|
+    if word_counts.has_key?(word)
+      word_counts[word] += 1
+    else
+      word_counts[word] = 1
+    end
+  end
+  
+  return {
+    unique_words: unique_words,
+    word_counts: word_counts
+  }
+end
+
+# Function to print top N most frequent words
+def print_top_words(word_counts, n = 10)
+  # Sort the hash by value (frequency) in descending order
+  sorted_words = word_counts.sort_by { |word, count| -count }
+  
+  # Extract the top N words (or all words if less than N)
+  top_n = sorted_words[0, [n, sorted_words.length].min]
+  
+  puts "\nTop #{top_n.length} most frequent words:"
+  puts "---------------------------"
+  
+  # Print each word and its frequency
+  top_n.each_with_index do |(word, count), index|
+    puts "#{index + 1}. '#{word}' - #{count} #{count == 1 ? 'occurrence' : 'occurrences'}"
+  end
+end
+
+# Main program
+puts "Word Frequency Analyzer"
+puts "---------------------"
+
+# Allow user to choose input method
+puts "\nChoose input method:"
+puts "1. Enter text directly"
+puts "2. Read from a file"
+
+print "Enter your choice (1-2): "
+choice = gets.chomp.to_i
+
+text = ""
+
+if choice == 1
+  puts "Enter your text (press Enter twice when done):"
+  
+  # Keep reading lines until an empty line is entered
+  while true
+    line = gets.chomp
+    break if line.empty?
+    text += line + " "
+  end
+  
+elsif choice == 2
+  print "Enter the filename: "
+  filename = gets.chomp
+  
+  if File.exist?(filename)
+    text = File.read(filename)
+    puts "File loaded successfully."
+  else
+    puts "Error: File not found."
+    exit
+  end
+else
+  puts "Invalid choice."
+  exit
+end
+
+# Analyze the text
+results = analyze_text(text)
+
+# Print the results
+puts "\nAnalysis Results:"
+puts "Total unique words: #{results[:unique_words].size}"
+
+# Print the top 10 most common words
+print_top_words(results[:word_counts], 10)
+</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Hashes</button>
+                <button class="btn next-btn">Next: Collection Methods →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Collection Methods</h2>
+            
+            <h3>Enumerable Module</h3>
+            <p>Ruby's Enumerable module provides a set of powerful methods for working with collections. Arrays, Hashes, Sets, and many other classes include this module.</p>
+            
+            <h3>Basic Iteration Methods</h3>
+            
+            <div class="code-example">
+                <pre>numbers = [1, 2, 3, 4, 5]
+
+# each - the fundamental iteration method
+numbers.each { |n| puts n }
+
+# each_with_index - provides both the element and its index
+numbers.each_with_index { |n, i| puts "numbers[#{i}] = #{n}" }
+
+# each_with_object - provides both the element and an accumulator object
+letters = ["a", "b", "c"]
+result = letters.each_with_object({}) { |letter, hash| hash[letter] = letter.upcase }
+# => {"a"=>"A", "b"=>"B", "c"=>"C"}</pre>
+            </div>
+            
+            <h3>Transformation Methods</h3>
+            
+            <div class="code-example">
+                <pre>numbers = [1, 2, 3, 4, 5]
+
+# map/collect - creates a new array by transforming each element
+squares = numbers.map { |n| n * n }  # => [1, 4, 9, 16, 25]
+
+# flat_map - maps and then flattens the result
+nested = [[1, 2], [3, 4]]
+nested.flat_map { |arr| arr }  # => [1, 2, 3, 4]
+
+# group_by - groups elements into a hash by the block's return value
+grouped = [1, 2, 3, 4, 5, 6].group_by { |n| n % 3 }
+# => {1=>[1, 4], 2=>[2, 5], 0=>[3, 6]}</pre>
+            </div>
+            
+            <h3>Selection Methods</h3>
+            
+            <div class="code-example">
+                <pre>numbers = [1, 2, 3, 4, 5, 6]
+
+# select/find_all - returns elements for which the block returns true
+evens = numbers.select { |n| n.even? }  # => [2, 4, 6]
+
+# reject - returns elements for which the block returns false
+odds = numbers.reject { |n| n.even? }   # => [1, 3, 5]
+
+# find/detect - returns the first element for which the block returns true
+first_even = numbers.find { |n| n.even? }  # => 2
+
+# find_index - returns the index of the first matching element
+index = numbers.find_index { |n| n > 3 }   # => 3 (index of 4)
+
+# grep - selects elements that match a pattern
+words = ["apple", "banana", "avocado", "pear"]
+a_words = words.grep(/^a/)  # => ["apple", "avocado"]</pre>
+            </div>
+            
+            <h3>Aggregation Methods</h3>
+            
+            <div class="code-example">
+                <pre>numbers = [1, 2, 3, 4, 5]
+
+# reduce/inject - combines elements using the provided operation
+sum = numbers.reduce(0) { |total, n| total + n }  # => 15
+product = numbers.reduce(1) { |total, n| total * n }  # => 120
+
+# Common operations have shortcuts
+sum = numbers.reduce(:+)  # => 15
+product = numbers.reduce(:*)  # => 120
+
+# max, min, minmax
+numbers.max  # => 5
+numbers.min  # => 1
+numbers.minmax  # => [1, 5]
+
+# Custom comparison
+words = ["apple", "banana", "cherry"]
+longest = words.max_by { |word| word.length }  # => "banana"
+
+# count
+words.count  # => 3
+words.count { |word| word.length > 5 }  # => 2 (banana, cherry)</pre>
+            </div>
+            
+            <h3>Boolean Methods</h3>
+            
+            <div class="code-example">
+                <pre>numbers = [1, 2, 3, 4, 5]
+
+# any? - returns true if the block returns true for any element
+numbers.any? { |n| n > 3 }  # => true
+
+# all? - returns true if the block returns true for all elements
+numbers.all? { |n| n > 0 }  # => true
+
+# none? - returns true if the block returns false for all elements
+numbers.none? { |n| n < 0 }  # => true
+
+# one? - returns true if the block returns true for exactly one element
+numbers.one? { |n| n > 4 }  # => true</pre>
+            </div>
+            
+            <h3>Sorting Methods</h3>
+            
+            <div class="code-example">
+                <pre>numbers = [5, 3, 1, 4, 2]
+
+# sort - returns a sorted array
+numbers.sort  # => [1, 2, 3, 4, 5]
+
+# sort_by - sorts using the block's return value
+words = ["apple", "banana", "cherry"]
+words.sort_by { |word| word.length }  # => ["apple", "cherry", "banana"]
+
+# Custom sorting with a block
+words.sort { |a, b| a.length <=> b.length }  # => ["apple", "cherry", "banana"]
+
+# Descending sort
+numbers.sort.reverse  # => [5, 4, 3, 2, 1]</pre>
+            </div>
+            
+            <h3>Lazy Evaluation</h3>
+            <p>The Enumerable#lazy method allows for more efficient processing of collections by only computing values as needed.</p>
+            
+            <div class="code-example">
+                <pre># Without lazy, this would compute all values before taking the first 3
+first_three_squares = (1..Float::INFINITY).lazy.map { |n| n * n }.first(3)
+# => [1, 4, 9]
+
+# Processing a large file efficiently
+File.open("large_file.txt").each_line.lazy.
+  map(&:chomp).
+  select { |line| line.include?("important") }.
+  take(5).
+  force  # force is needed to actually evaluate the lazy enumerable</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Data Analysis</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Defines an array of student records, where each record is a hash containing:
+                        <ul>
+                            <li>Name</li>
+                            <li>Age</li>
+                            <li>Grades (an array of numbers)</li>
+                            <li>Subjects (an array of strings)</li>
+                        </ul>
+                    </li>
+                    <li>Implements methods to:
+                        <ul>
+                            <li>Find the student with the highest average grade</li>
+                            <li>Group students by age</li>
+                            <li>Find all students taking a particular subject</li>
+                            <li>Calculate the class average for each subject</li>
+                            <li>Identify students who are above the class average in all subjects</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p>This project will help you practice using various collection methods in a realistic scenario.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('data-analysis', event)">Show Solution</button>
+                <div id="data-analysis" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 3: Mini Project - Data Analysis
+
+# Define the student records
+students = [
+  {
+    name: "Emma",
+    age: 21,
+    grades: [85, 90, 84, 88, 92],
+    subjects: ["Math", "English", "Science", "History", "Programming"]
+  },
+  {
+    name: "Jack",
+    age: 20,
+    grades: [75, 82, 87, 90, 65],
+    subjects: ["Math", "English", "Science", "Art", "Programming"]
+  },
+  {
+    name: "Olivia",
+    age: 22,
+    grades: [92, 95, 88, 78, 89],
+    subjects: ["Math", "Psychology", "Science", "History", "Programming"]
+  },
+  {
+    name: "Noah",
+    age: 19,
+    grades: [70, 72, 78, 82, 80],
+    subjects: ["Math", "English", "Physics", "History", "Programming"]
+  },
+  {
+    name: "Sophia",
+    age: 20,
+    grades: [88, 84, 91, 78, 94],
+    subjects: ["Math", "English", "Chemistry", "Philosophy", "Programming"]
+  },
+  {
+    name: "William",
+    age: 21,
+    grades: [81, 85, 87, 89, 90],
+    subjects: ["Math", "Literature", "Science", "History", "Programming"]
+  }
+]
+
+# Function to calculate a student's average grade
+def calculate_average(grades)
+  sum = 0
+  grades.each do |grade|
+    sum += grade
+  end
+  return sum.to_f / grades.length
+end
+
+# Find the student with the highest average grade
+def find_top_student(students)
+  top_student = nil
+  highest_average = 0
+  
+  students.each do |student|
+    avg = calculate_average(student[:grades])
+    if avg > highest_average
+      highest_average = avg
+      top_student = student
+    end
+  end
+  
+  return {
+    student: top_student,
+    average: highest_average
+  }
+end
+
+# Group students by age
+def group_by_age(students)
+  age_groups = {}
+  
+  students.each do |student|
+    age = student[:age]
+    
+    if age_groups.has_key?(age)
+      age_groups[age] << student[:name]
+    else
+      age_groups[age] = [student[:name]]
+    end
+  end
+  
+  return age_groups
+end
+
+# Find all students taking a particular subject
+def find_students_by_subject(students, subject)
+  matching_students = []
+  
+  students.each do |student|
+    if student[:subjects].include?(subject)
+      matching_students << student[:name]
+    end
+  end
+  
+  return matching_students
+end
+
+# Calculate the class average for each subject
+def calculate_subject_averages(students)
+  # First, gather all unique subjects
+  all_subjects = []
+  students.each do |student|
+    student[:subjects].each do |subject|
+      all_subjects << subject unless all_subjects.include?(subject)
+    end
+  end
+  
+  # Create a mapping between subjects and student grades
+  subject_grades = {}
+  all_subjects.each do |subject|
+    subject_grades[subject] = []
+  end
+  
+  # For each student, add their grade to the appropriate subject
+  students.each do |student|
+    student[:subjects].each_with_index do |subject, index|
+      subject_grades[subject] << student[:grades][index] if index < student[:grades].length
+    end
+  end
+  
+  # Calculate averages for each subject
+  subject_averages = {}
+  subject_grades.each do |subject, grades|
+    total = 0
+    grades.each { |grade| total += grade }
+    subject_averages[subject] = grades.empty? ? 0 : total.to_f / grades.length
+  end
+  
+  return subject_averages
+end
+
+# Identify students who are above the class average in all subjects
+def find_above_average_students(students)
+  # Get the class average for each subject
+  subject_averages = calculate_subject_averages(students)
+  
+  above_average_students = []
+  
+  students.each do |student|
+    all_above_average = true
+    
+    student[:subjects].each_with_index do |subject, index|
+      # Check if the student's grade for this subject is above average
+      if index < student[:grades].length
+        student_grade = student[:grades][index]
+        class_average = subject_averages[subject]
+        
+        if student_grade <= class_average
+          all_above_average = false
+          break
+        end
+      end
+    end
+    
+    if all_above_average
+      above_average_students << student[:name]
+    end
+  end
+  
+  return above_average_students
+end
+
+# Display the results
+
+puts "===== Student Data Analysis =====\n"
+
+# Find and display the top student
+top_student_result = find_top_student(students)
+puts "Student with highest average grade: #{top_student_result[:student][:name]}"
+puts "Average grade: #{top_student_result[:average].round(2)}\n"
+
+# Group and display students by age
+puts "Students by Age Group:"
+age_groups = group_by_age(students)
+age_groups.each do |age, names|
+  puts "  Age #{age}: #{names.join(', ')}"
+end
+puts ""
+
+# Find and display students by subject
+subject = "Math"
+puts "Students taking #{subject}: #{find_students_by_subject(students, subject).join(', ')}\n"
+
+# Calculate and display subject averages
+puts "Subject Averages:"
+calculate_subject_averages(students).each do |subject, average|
+  puts "  #{subject}: #{average.round(2)}"
+end
+puts ""
+
+# Find and display students above average in all subjects
+above_avg_students = find_above_average_students(students)
+puts "Students above class average in all subjects: #{above_avg_students.empty? ? 'None' : above_avg_students.join(', ')}"
+</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Sets</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

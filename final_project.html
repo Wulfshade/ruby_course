@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Project: Ruby Coding Agent - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Final Project: Ruby Coding Agent</h1>
+        <p>Build a powerful coding assistant powered by DeepSeek AI</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="intro">
+            <h2>Project Overview</h2>
+            <p>In this collaborative final project, you'll build a coding agent in Ruby that can help you write, understand, and modify code. The agent will use the DeepSeek API to provide AI-powered assistance.</p>
+            
+            <p>This project combines many of the skills you've learned throughout this course:</p>
+            <ul>
+                <li>Object-oriented programming</li>
+                <li>Working with APIs</li>
+                <li>Error handling</li>
+                <li>Testing</li>
+                <li>Code organization</li>
+                <li>Creating and using gems</li>
+            </ul>
+            
+            <p>The project is designed for group collaboration, with multiple components that can be implemented and discussed together. Each section includes discussion prompts to explore different implementation approaches.</p>
+        </section>
+
+        <section class="project-details">
+            <h2>Project Requirements</h2>
+            
+            <h3>Functionality</h3>
+            <p>Your coding agent should be able to:</p>
+            <ol>
+                <li>Engage in a chat-based conversation with the user</li>
+                <li>Read files from the local filesystem</li>
+                <li>List files in directories</li>
+                <li>Edit files by replacing specified text</li>
+                <li>Execute shell commands</li>
+                <li>Use the DeepSeek API to generate responses</li>
+            </ol>
+            
+            <h3>Technical Requirements</h3>
+            <ol>
+                <li>Implement the agent using modular, object-oriented Ruby code</li>
+                <li>Write tests for all components</li>
+                <li>Handle errors gracefully</li>
+                <li>Include proper documentation</li>
+                <li>Follow Ruby coding conventions</li>
+            </ol>
+            
+            <h3>DeepSeek API</h3>
+            <p>DeepSeek provides powerful AI models via their API. You'll need to:</p>
+            <ol>
+                <li>Sign up for a DeepSeek API key</li>
+                <li>Learn how to use their API for chat completions</li>
+                <li>Implement tool-calling functionality</li>
+            </ol>
+        </section>
+
+        <section class="implementation-guide">
+            <h2>Implementation Guide</h2>
+            
+            <p>We'll break down the implementation into several components. For each component, we'll provide guidance and discussion prompts to explore different approaches.</p>
+            
+            <h3>1. Project Structure</h3>
+            <p>Let's start by setting up the project structure:</p>
+            
+            <div class="code-example">
+                <pre>ruby-coding-agent/
+├── lib/
+│   ├── coding_agent.rb
+│   ├── chat_loop.rb
+│   ├── tools/
+│   │   ├── base_tool.rb
+│   │   ├── read_file_tool.rb
+│   │   ├── list_files_tool.rb
+│   │   ├── edit_file_tool.rb
+│   │   └── execute_command_tool.rb
+│   └── api/
+│       └── deepseek_client.rb
+├── bin/
+│   └── agent
+├── spec/
+│   ├── coding_agent_spec.rb
+│   ├── chat_loop_spec.rb
+│   ├── tools/
+│   │   └── ...
+│   └── api/
+│       └── deepseek_client_spec.rb
+├── Gemfile
+├── README.md
+└── coding_agent.gemspec</pre>
+            </div>
+            
+            <div class="discussion-prompt">
+                <h4>Discussion: Project Organization</h4>
+                <p>Consider these questions:</p>
+                <ul>
+                    <li>What are the advantages of organizing the code as a gem?</li>
+                    <li>How would you structure the classes and modules?</li>
+                    <li>What responsibilities should each component have?</li>
+                    <li>How would you handle configuration (e.g., API keys)?</li>
+                </ul>
+            </div>
+            
+            <h3>2. DeepSeek API Client</h3>
+            <p>Let's implement the client for interacting with the DeepSeek API:</p>
+            
+            <div class="code-example">
+                <pre>require 'httparty'
+require 'json'
+
+module CodingAgent
+  module API
+    class DeepSeekClient
+      BASE_URL = "https://api.deepseek.com/v1"
+      
+      def initialize(api_key)
+        @api_key = api_key
+      end
+      
+      def chat(messages, tools = nil)
+        url = "#{BASE_URL}/chat/completions"
+        
+        payload = {
+          model: "deepseek-coder",
+          messages: messages,
+          temperature: 0.7
+        }
+        
+        # Add tools if provided
+        payload[:tools] = tools if tools
+        
+        response = HTTParty.post(
+          url,
+          headers: {
+            "Content-Type" => "application/json",
+            "Authorization" => "Bearer #{@api_key}"
+          },
+          body: payload.to_json
+        )
+        
+        handle_response(response)
+      end
+      
+      private
+      
+      def handle_response(response)
+        if response.success?
+          JSON.parse(response.body)
+        else
+          raise "API request failed: #{response.code} - #{response.message}"
+        end
+      end
+    end
+  end
+end</pre>
+            </div>
+            
+            <div class="discussion-prompt">
+                <h4>Discussion: API Integration</h4>
+                <p>Consider these questions:</p>
+                <ul>
+                    <li>How would you handle API rate limiting?</li>
+                    <li>What error handling strategies would you implement?</li>
+                    <li>How would you mock this API client for testing?</li>
+                    <li>What parameters would you expose for customization?</li>
+                </ul>
+            </div>
+            
+            <h3>3. Tool Implementation</h3>
+            <p>Now, let's create the base tool class and implement specific tools:</p>
+            
+            <h4>Base Tool</h4>
+            <div class="code-example">
+                <pre>module CodingAgent
+  module Tools
+    class BaseTool
+      attr_reader :name, :description, :parameters
+      
+      def initialize(name, description, parameters)
+        @name = name
+        @description = description
+        @parameters = parameters
+      end
+      
+      def execute(params)
+        raise NotImplementedError, "Subclasses must implement execute method"
+      end
+      
+      def to_tool_spec
+        {
+          type: "function",
+          function: {
+            name: @name,
+            description: @description,
+            parameters: {
+              type: "object",
+              properties: @parameters,
+              required: required_parameters
+            }
+          }
+        }
+      end
+      
+      private
+      
+      def required_parameters
+        @parameters.select { |_, v| v[:required] }.keys
+      end
+    end
+  end
+end</pre>
+            </div>
+            
+            <h4>Read File Tool</h4>
+            <div class="code-example">
+                <pre>module CodingAgent
+  module Tools
+    class ReadFileTool < BaseTool
+      def initialize
+        super(
+          "read_file",
+          "Read the contents of a file",
+          {
+            "file_path" => {
+              type: "string",
+              description: "The path to the file to read",
+              required: true
+            }
+          }
+        )
+      end
+      
+      def execute(params)
+        file_path = params["file_path"]
+        
+        begin
+          if File.exist?(file_path)
+            content = File.read(file_path)
+            { success: true, content: content }
+          else
+            { success: false, error: "File not found: #{file_path}" }
+          end
+        rescue => e
+          { success: false, error: "Error reading file: #{e.message}" }
+        end
+      end
+    end
+  end
+end</pre>
+            </div>
+            
+            <div class="discussion-prompt">
+                <h4>Discussion: Tool Design</h4>
+                <p>Consider these questions:</p>
+                <ul>
+                    <li>What security considerations should you keep in mind when implementing file system tools?</li>
+                    <li>How would you implement the other tools (list files, edit files, execute commands)?</li>
+                    <li>How would you ensure that tools are easily extensible?</li>
+                    <li>What validation should be performed on tool parameters?</li>
+                </ul>
+            </div>
+            
+            <h3>4. Chat Loop Implementation</h3>
+            <p>Next, let's implement the chat loop that drives the interaction:</p>
+            
+            <div class="code-example">
+                <pre>module CodingAgent
+  class ChatLoop
+    def initialize(api_client, tools = [])
+      @api_client = api_client
+      @tools = tools
+      @messages = []
+      @tool_map = build_tool_map(tools)
+    end
+    
+    def start
+      puts "Ruby Coding Agent (Type 'exit' to quit)"
+      puts "----------------------------------------"
+      
+      # Add system message
+      @messages << {
+        role: "system",
+        content: "You are a helpful coding assistant. You can help with writing, understanding, and modifying code."
+      }
+      
+      loop do
+        print "> "
+        user_input = gets.chomp
+        
+        break if user_input.downcase == "exit"
+        
+        # Add user message
+        @messages << { role: "user", content: user_input }
+        
+        # Get response from API
+        response = get_response
+        
+        # Process the response
+        process_response(response)
+      end
+    end
+    
+    private
+    
+    def build_tool_map(tools)
+      tools.each_with_object({}) do |tool, map|
+        map[tool.name] = tool
+      end
+    end
+    
+    def get_response
+      tool_specs = @tools.map(&:to_tool_spec)
+      @api_client.chat(@messages, tool_specs)
+    end
+    
+    def process_response(response)
+      assistant_message = response["choices"][0]["message"]
+      
+      # Check if we have a tool call
+      if assistant_message["tool_calls"]
+        handle_tool_calls(assistant_message)
+      else
+        # Regular text response
+        puts "Assistant: #{assistant_message['content']}"
+        @messages << assistant_message
+      end
+    end
+    
+    def handle_tool_calls(message)
+      puts "Assistant: (thinking...)"
+      
+      # Add the assistant message to our history
+      @messages << message
+      
+      # Process each tool call
+      message["tool_calls"].each do |tool_call|
+        function_name = tool_call["function"]["name"]
+        function_args = JSON.parse(tool_call["function"]["arguments"])
+        
+        tool = @tool_map[function_name]
+        if tool
+          result = tool.execute(function_args)
+          
+          # Add the tool result to our history
+          @messages << {
+            role: "tool",
+            tool_call_id: tool_call["id"],
+            content: JSON.generate(result)
+          }
+        else
+          puts "Unknown tool: #{function_name}"
+        end
+      end
+      
+      # Get the next response after tool execution
+      response = get_response
+      process_response(response)
+    end
+  end
+end</pre>
+            </div>
+            
+            <div class="discussion-prompt">
+                <h4>Discussion: Chat Loop Design</h4>
+                <p>Consider these questions:</p>
+                <ul>
+                    <li>How would you improve the user experience of the chat loop?</li>
+                    <li>What strategies would you use to manage the conversation history?</li>
+                    <li>How would you handle parallel tool calls?</li>
+                    <li>What debugging features would be helpful to add?</li>
+                </ul>
+            </div>
+            
+            <h3>5. Main Agent Class</h3>
+            <p>Let's tie everything together with the main agent class:</p>
+            
+            <div class="code-example">
+                <pre>require_relative 'api/deepseek_client'
+require_relative 'chat_loop'
+require_relative 'tools/read_file_tool'
+require_relative 'tools/list_files_tool'
+require_relative 'tools/edit_file_tool'
+require_relative 'tools/execute_command_tool'
+
+module CodingAgent
+  class Agent
+    def initialize(api_key)
+      @api_client = API::DeepSeekClient.new(api_key)
+      @tools = [
+        Tools::ReadFileTool.new,
+        Tools::ListFilesTool.new,
+        Tools::EditFileTool.new,
+        Tools::ExecuteCommandTool.new
+      ]
+    end
+    
+    def start
+      chat_loop = ChatLoop.new(@api_client, @tools)
+      chat_loop.start
+    end
+  end
+end</pre>
+            </div>
+            
+            <div class="discussion-prompt">
+                <h4>Discussion: Agent Design</h4>
+                <p>Consider these questions:</p>
+                <ul>
+                    <li>How would you make the agent more configurable?</li>
+                    <li>What additional features would be useful to add?</li>
+                    <li>How would you implement logging for debugging?</li>
+                    <li>What strategies would you use to improve the agent's code quality?</li>
+                </ul>
+            </div>
+            
+            <h3>6. Testing</h3>
+            <p>Now, let's implement tests for our components:</p>
+            
+            <div class="code-example">
+                <pre>require 'rspec'
+require_relative '../lib/tools/read_file_tool'
+
+describe CodingAgent::Tools::ReadFileTool do
+  let(:tool) { described_class.new }
+  
+  describe '#to_tool_spec' do
+    it 'returns a valid tool specification' do
+      spec = tool.to_tool_spec
+      
+      expect(spec[:type]).to eq('function')
+      expect(spec[:function][:name]).to eq('read_file')
+      expect(spec[:function][:parameters][:properties]).to have_key('file_path')
+    end
+  end
+  
+  describe '#execute' do
+    context 'when the file exists' do
+      before do
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).and_return('file content')
+      end
+      
+      it 'returns the file content' do
+        result = tool.execute({'file_path' => 'test.txt'})
+        
+        expect(result[:success]).to be true
+        expect(result[:content]).to eq('file content')
+      end
+    end
+    
+    context 'when the file does not exist' do
+      before do
+        allow(File).to receive(:exist?).and_return(false)
+      end
+      
+      it 'returns an error' do
+        result = tool.execute({'file_path' => 'nonexistent.txt'})
+        
+        expect(result[:success]).to be false
+        expect(result[:error]).to include('File not found')
+      end
+    end
+    
+    context 'when an error occurs' do
+      before do
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:read).and_raise(StandardError.new('test error'))
+      end
+      
+      it 'returns an error' do
+        result = tool.execute({'file_path' => 'test.txt'})
+        
+        expect(result[:success]).to be false
+        expect(result[:error]).to include('Error reading file')
+      end
+    end
+  end
+end</pre>
+            </div>
+            
+            <div class="discussion-prompt">
+                <h4>Discussion: Testing Strategy</h4>
+                <p>Consider these questions:</p>
+                <ul>
+                    <li>What testing framework would you use and why?</li>
+                    <li>How would you test the integration with the DeepSeek API?</li>
+                    <li>What mocking strategies would be appropriate?</li>
+                    <li>How would you test the chat loop with user interaction?</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="group-project">
+            <h2>Group Collaboration</h2>
+            
+            <p>This project is designed for group collaboration. Here are some suggested ways to work together:</p>
+            
+            <h3>Team Organization</h3>
+            <ol>
+                <li><strong>API Team</strong>: Focus on the DeepSeek API integration</li>
+                <li><strong>Tools Team</strong>: Implement the various tools</li>
+                <li><strong>Core Team</strong>: Work on the chat loop and agent logic</li>
+                <li><strong>Testing Team</strong>: Develop comprehensive tests</li>
+            </ol>
+            
+            <h3>Development Process</h3>
+            <ol>
+                <li>Start with group discussion about architecture and design</li>
+                <li>Break down the work into tasks and assign to team members</li>
+                <li>Use Git for collaboration and version control</li>
+                <li>Set up regular code reviews</li>
+                <li>Integrate the components</li>
+                <li>Test thoroughly</li>
+                <li>Document the code and usage</li>
+            </ol>
+            
+            <h3>Extensions and Enhancements</h3>
+            <p>Once the basic functionality is working, consider these extensions:</p>
+            <ul>
+                <li>Add memory capabilities to remember past conversations</li>
+                <li>Implement specialized code analysis tools</li>
+                <li>Create a web interface using Sinatra</li>
+                <li>Add support for multiple AI models</li>
+                <li>Implement project-specific context awareness</li>
+                <li>Add code generation templates</li>
+            </ul>
+        </section>
+
+        <section class="conclusion">
+            <h2>Conclusion</h2>
+            
+            <p>Building a coding agent in Ruby is a comprehensive project that pulls together many aspects of Ruby development. By working together, you'll not only create a useful tool but also gain experience in collaborative software development.</p>
+            
+            <p>Remember that the journey is as important as the destination. Take time to discuss different approaches, learn from each other, and explore Ruby's capabilities.</p>
+            
+            <p>Good luck with your project!</p>
+            
+            <div class="project-resources">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="https://deepseek.com/docs/api" target="_blank">DeepSeek API Documentation</a></li>
+                    <li><a href="https://radanskoric.com/articles/coding-agent-in-ruby" target="_blank">Building a Coding Agent in Ruby</a></li>
+                    <li><a href="https://github.com/httparty/httparty" target="_blank">HTTParty Gem</a></li>
+                    <li><a href="https://rspec.info/" target="_blank">RSpec Testing Framework</a></li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

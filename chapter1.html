@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Ruby Fundamentals - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Ruby Fundamentals</h1>
+        <p>Learn the basic building blocks of Ruby programming</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">Installation and Setup</button>
+                <button class="topic-btn" data-target="topic2">Variables and Data Types</button>
+                <button class="topic-btn" data-target="topic3">Basic Operators</button>
+                <button class="topic-btn" data-target="topic4">Input/Output Operations</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>Installation and Setup</h2>
+            
+            <h3>Getting Ruby on Your System</h3>
+            <p>Before we can start programming in Ruby, we need to install it on our system. Ruby is available for all major operating systems.</p>
+            
+            <h4>On macOS:</h4>
+            <p>macOS comes with Ruby pre-installed, but it's usually an older version. To install the latest version, you can use Homebrew:</p>
+            <div class="code-example">
+                <pre>$ brew install ruby</pre>
+            </div>
+            
+            <h4>On Windows:</h4>
+            <p>Download and install Ruby using RubyInstaller from <a href="https://rubyinstaller.org/" target="_blank">rubyinstaller.org</a></p>
+            
+            <h4>On Linux:</h4>
+            <div class="code-example">
+                <pre>$ sudo apt-get install ruby-full  # For Debian/Ubuntu
+$ sudo yum install ruby  # For CentOS/RHEL</pre>
+            </div>
+            
+            <h3>Verifying Your Installation</h3>
+            <p>Once installed, you can verify your Ruby version by opening a terminal or command prompt and typing:</p>
+            <div class="code-example">
+                <pre>$ ruby -v</pre>
+            </div>
+            
+            <h3>Interactive Ruby (IRB)</h3>
+            <p>Ruby comes with an interactive shell called IRB. This is a great place to test small pieces of code and experiment.</p>
+            <div class="code-example">
+                <pre>$ irb
+irb(main):001:0> puts "Hello, Ruby!"
+Hello, Ruby!
+=> nil</pre>
+            </div>
+            
+            <h3>Creating Your First Ruby Program</h3>
+            <p>Let's create a simple "Hello World" program:</p>
+            <ol>
+                <li>Create a file named <code>hello.rb</code></li>
+                <li>Add this code:</li>
+            </ol>
+            <div class="code-example">
+                <pre>#!/usr/bin/env ruby
+
+puts "Hello, Ruby World!"</pre>
+            </div>
+            <p>Run it with:</p>
+            <div class="code-example">
+                <pre>$ ruby hello.rb</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Setup Challenge</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Displays your Ruby version</li>
+                    <li>Prints the current date and time</li>
+                    <li>Shows a welcome message of your choice</li>
+                </ol>
+                <p>Hint: You can use <code>RUBY_VERSION</code> to get the Ruby version and <code>Time.now</code> to get the current time.</p>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Variables and Data Types →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Variables and Data Types</h2>
+            
+            <h3>Variables in Ruby</h3>
+            <p>Variables in Ruby are used to store data. Unlike many other languages, Ruby variables don't need to be declared with a specific type.</p>
+            
+            <div class="code-example">
+                <pre>name = "Ruby"
+age = 30
+is_programming_language = true</pre>
+            </div>
+            
+            <h3>Naming Conventions</h3>
+            <p>Ruby variable names follow these conventions:</p>
+            <ul>
+                <li>They are case sensitive (<code>name</code> and <code>Name</code> are different variables)</li>
+                <li>They can contain letters, numbers, and underscores</li>
+                <li>They should start with a lowercase letter or underscore</li>
+                <li>By convention, multi-word variables use snake_case: <code>user_name</code>, <code>first_name</code></li>
+            </ul>
+            
+            <h3>Core Data Types</h3>
+            
+            <h4>Numbers</h4>
+            <div class="code-example">
+                <pre># Integers
+age = 30
+temperature = -5
+
+# Floating point numbers
+pi = 3.14159
+weight = 65.5</pre>
+            </div>
+            
+            <h4>Strings</h4>
+            <div class="code-example">
+                <pre># String literals
+name = "Ruby"
+message = 'Hello, World!'
+
+# String interpolation (only works with double quotes)
+greeting = "Hello, #{name}!"  # => "Hello, Ruby!"</pre>
+            </div>
+            
+            <h4>Booleans</h4>
+            <div class="code-example">
+                <pre>is_valid = true
+has_errors = false</pre>
+            </div>
+            
+            <h4>Symbols</h4>
+            <p>Symbols are lightweight strings, often used as keys in hashes.</p>
+            <div class="code-example">
+                <pre>status = :success
+direction = :north</pre>
+            </div>
+            
+            <h4>Arrays</h4>
+            <div class="code-example">
+                <pre>fruits = ["apple", "banana", "cherry"]
+mixed_array = [1, "two", :three, 4.0]
+
+# Accessing elements (zero-indexed)
+fruits[0]  # => "apple"</pre>
+            </div>
+            
+            <h4>Hashes</h4>
+            <div class="code-example">
+                <pre>person = {
+  "name" => "Alice",
+  "age" => 30,
+  "occupation" => "Developer"
+}
+
+# Modern syntax with symbols as keys
+person = {
+  name: "Alice",
+  age: 30,
+  occupation: "Developer"
+}
+
+# Accessing values
+person[:name]  # => "Alice"</pre>
+            </div>
+            
+            <h4>nil</h4>
+            <p><code>nil</code> represents the absence of a value in Ruby, similar to <code>null</code> in other languages.</p>
+            <div class="code-example">
+                <pre>empty_value = nil</pre>
+            </div>
+            
+            <h3>Type Conversion</h3>
+            <div class="code-example">
+                <pre># String to Integer
+"123".to_i  # => 123
+
+# Integer to String
+42.to_s  # => "42"
+
+# String to Float
+"3.14".to_f  # => 3.14</pre>
+            </div>
+            
+            <h3>Checking Data Types</h3>
+            <div class="code-example">
+                <pre># Using .class method
+42.class  # => Integer
+"hello".class  # => String
+
+# Using .is_a? method
+42.is_a?(Integer)  # => true
+"hello".is_a?(String)  # => true</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Data Type Explorer</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Declares at least one variable of each data type discussed</li>
+                    <li>Prints the value and class of each variable</li>
+                    <li>Experiments with type conversion (try converting strings to numbers, numbers to strings, etc.)</li>
+                    <li>Creates a hash containing information about yourself (name, age, favorite programming language, etc.)</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('data-type-explorer', event)">Show Solution</button>
+                <div id="data-type-explorer" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 1: Mini Project - Data Type Explorer
+
+# Declare variables of each data type
+my_integer = 42
+my_float = 3.14159
+my_string = "Ruby is fun!"
+my_boolean_true = true
+my_boolean_false = false
+my_nil = nil
+my_symbol = :ruby
+my_array = [1, 2, 3, "four", :five]
+my_hash = {name: "Ruby", year: 1995, creator: "Yukihiro Matsumoto"}
+
+# Print the value and class of each variable
+puts "Integer: #{my_integer} (#{my_integer.class})"
+puts "Float: #{my_float} (#{my_float.class})"
+puts "String: #{my_string} (#{my_string.class})"
+puts "Boolean (true): #{my_boolean_true} (#{my_boolean_true.class})"
+puts "Boolean (false): #{my_boolean_false} (#{my_boolean_false.class})"
+puts "Nil: #{my_nil} (#{my_nil.class})"
+puts "Symbol: #{my_symbol} (#{my_symbol.class})"
+puts "Array: #{my_array} (#{my_array.class})"
+puts "Hash: #{my_hash} (#{my_hash.class})"
+
+# Experiments with type conversion
+puts "\nType Conversion Examples:"
+puts "String to Integer: '123' => #{'123'.to_i} (#{'123'.to_i.class})"
+puts "String to Float: '3.14' => #{'3.14'.to_f} (#{'3.14'.to_f.class})"
+puts "Integer to String: 42 => #{42.to_s} (#{42.to_s.class})"
+puts "Float to Integer: 9.99 => #{9.99.to_i} (#{9.99.to_i.class})"
+
+# Create a hash about myself
+my_info = {
+  name: "Ruby Student",
+  age: 25,
+  favorite_language: "Ruby",
+  learning_since: 2025,
+  hobbies: ["coding", "reading", "hiking"]
+}
+
+# Print the hash information
+puts "\nMy Information:"
+puts "Name: #{my_info[:name]}"
+puts "Age: #{my_info[:age]}"
+puts "Favorite Programming Language: #{my_info[:favorite_language]}"
+puts "Learning Since: #{my_info[:learning_since]}"
+puts "Hobbies: #{my_info[:hobbies].join(', ')}"
+</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Installation and Setup</button>
+                <button class="btn next-btn">Next: Basic Operators →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Basic Operators</h2>
+            
+            <h3>Arithmetic Operators</h3>
+            <p>Ruby provides standard arithmetic operators for mathematical operations:</p>
+            <div class="code-example">
+                <pre>a = 10
+b = 3
+
+addition = a + b  # => 13
+subtraction = a - b  # => 7
+multiplication = a * b  # => 30
+division = a / b  # => 3 (integer division)
+division_float = a / b.to_f  # => 3.3333333333333335 (floating point division)
+modulus = a % b  # => 1 (remainder of division)
+exponentiation = a ** b  # => 1000 (a raised to the power of b)</pre>
+            </div>
+            
+            <h3>Assignment Operators</h3>
+            <div class="code-example">
+                <pre>x = 5  # Basic assignment
+
+# Compound assignment
+x += 3  # Same as x = x + 3, now x is 8
+x -= 2  # Same as x = x - 2, now x is 6
+x *= 4  # Same as x = x * 4, now x is 24
+x /= 3  # Same as x = x / 3, now x is 8
+x %= 5  # Same as x = x % 5, now x is 3
+x **= 2  # Same as x = x ** 2, now x is 9</pre>
+            </div>
+            
+            <h3>Comparison Operators</h3>
+            <div class="code-example">
+                <pre>a = 10
+b = 5
+c = 10
+
+a == c  # => true (equality)
+a != b  # => true (inequality)
+a > b   # => true (greater than)
+a < b   # => false (less than)
+a >= c  # => true (greater than or equal to)
+a <= b  # => false (less than or equal to)
+
+# Spaceship operator (returns -1, 0, or 1)
+a <=> b  # => 1 (a > b)
+a <=> c  # => 0 (a == c)
+b <=> a  # => -1 (b < a)</pre>
+            </div>
+            
+            <h3>Logical Operators</h3>
+            <div class="code-example">
+                <pre>true && true    # => true (AND: both operands are true)
+true && false   # => false
+
+true || false   # => true (OR: at least one operand is true)
+false || false  # => false
+
+!true   # => false (NOT: negation)
+!false  # => true
+
+# Alternative syntax
+true and true   # => true
+true or false   # => true
+not true        # => false</pre>
+            </div>
+            
+            <p>Note: <code>and</code>, <code>or</code>, and <code>not</code> have lower precedence than <code>&&</code>, <code>||</code>, and <code>!</code>.</p>
+            
+            <h3>String Operators</h3>
+            <div class="code-example">
+                <pre>first_name = "Ruby"
+last_name = "Programming"
+
+# String concatenation
+full_name = first_name + " " + last_name  # => "Ruby Programming"
+
+# String multiplication
+separator = "-" * 10  # => "----------"
+
+# String interpolation
+message = "#{first_name} is fun!"  # => "Ruby is fun!"</pre>
+            </div>
+            
+            <h3>Range Operators</h3>
+            <div class="code-example">
+                <pre># Inclusive range (includes both start and end values)
+(1..5).to_a  # => [1, 2, 3, 4, 5]
+
+# Exclusive range (excludes the end value)
+(1...5).to_a  # => [1, 2, 3, 4]
+
+# Character ranges
+('a'..'e').to_a  # => ["a", "b", "c", "d", "e"]</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Temperature Converter</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Defines a temperature in Celsius</li>
+                    <li>Converts it to Fahrenheit using the formula: F = C * 9/5 + 32</li>
+                    <li>Displays both temperatures</li>
+                    <li>Compares the two temperatures and displays whether the Fahrenheit value is greater than, less than, or equal to the Celsius value</li>
+                </ol>
+                <p>Bonus: Make the script convert Fahrenheit to Celsius as well!</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('temperature-converter', event)">Show Solution</button>
+                <div id="temperature-converter" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 1: Mini Project - Temperature Converter
+
+# Define a temperature in Celsius
+celsius_temp = 30
+
+# Convert it to Fahrenheit using the formula: F = C * 9/5 + 32
+fahrenheit_temp = (celsius_temp * 9.0 / 5.0) + 32.0
+
+# Display both temperatures
+puts "Temperature in Celsius: #{celsius_temp}°C"
+puts "Temperature in Fahrenheit: #{fahrenheit_temp}°F"
+
+# Compare the two temperatures and display whether the Fahrenheit value is
+# greater than, less than, or equal to the Celsius value
+if fahrenheit_temp > celsius_temp
+  puts "The Fahrenheit temperature (#{fahrenheit_temp}°F) is greater than the Celsius temperature (#{celsius_temp}°C)."
+elsif fahrenheit_temp < celsius_temp
+  puts "The Fahrenheit temperature (#{fahrenheit_temp}°F) is less than the Celsius temperature (#{celsius_temp}°C)."
+else
+  puts "The Fahrenheit temperature (#{fahrenheit_temp}°F) is equal to the Celsius temperature (#{celsius_temp}°C)."
+end
+
+# BONUS: Convert Fahrenheit to Celsius as well
+puts "\n--- BONUS: Fahrenheit to Celsius ---"
+original_fahrenheit = 98.6
+original_celsius = (original_fahrenheit - 32.0) * 5.0 / 9.0
+puts "Temperature in Fahrenheit: #{original_fahrenheit}°F"
+puts "Converted to Celsius: #{original_celsius}°C"
+</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Variables and Data Types</button>
+                <button class="btn next-btn">Next: Input/Output Operations →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Input/Output Operations</h2>
+            
+            <h3>Output Methods</h3>
+            <p>Ruby provides several methods for displaying output:</p>
+            
+            <h4>puts</h4>
+            <p>The <code>puts</code> method prints the given object(s) followed by a newline character.</p>
+            <div class="code-example">
+                <pre>puts "Hello, Ruby!"
+# Output: Hello, Ruby!
+# (with a newline at the end)
+
+# Multiple arguments
+puts "First line", "Second line"
+# Output:
+# First line
+# Second line</pre>
+            </div>
+            
+            <h4>print</h4>
+            <p>The <code>print</code> method displays output without adding a newline at the end.</p>
+            <div class="code-example">
+                <pre>print "Hello, "
+print "Ruby!"
+# Output: Hello, Ruby! (on the same line)</pre>
+            </div>
+            
+            <h4>p</h4>
+            <p>The <code>p</code> method displays the raw representation of an object, which is useful for debugging.</p>
+            <div class="code-example">
+                <pre>puts "Hello\nWorld"
+# Output:
+# Hello
+# World
+
+p "Hello\nWorld"
+# Output: "Hello\nWorld" (shows the actual string with escape characters)</pre>
+            </div>
+            
+            <h4>printf</h4>
+            <p>For formatted output, similar to C's printf:</p>
+            <div class="code-example">
+                <pre>name = "Ruby"
+age = 30
+printf("Name: %s, Age: %d\n", name, age)
+# Output: Name: Ruby, Age: 30</pre>
+            </div>
+            
+            <h3>Input Methods</h3>
+            
+            <h4>gets</h4>
+            <p>The <code>gets</code> method reads a line of input from the user, including the newline character at the end.</p>
+            <div class="code-example">
+                <pre>print "Enter your name: "
+name = gets
+puts "Hello, #{name}"
+# If user enters "Alice", output will be:
+# Hello, Alice
+# (with an extra newline)</pre>
+            </div>
+            
+            <h4>gets.chomp</h4>
+            <p>To remove the trailing newline, we use <code>chomp</code>:</p>
+            <div class="code-example">
+                <pre>print "Enter your name: "
+name = gets.chomp
+puts "Hello, #{name}!"
+# If user enters "Alice", output will be:
+# Hello, Alice!</pre>
+            </div>
+            
+            <h4>Converting Input</h4>
+            <p>Input from <code>gets</code> is always a string, so we need to convert it for numeric operations:</p>
+            <div class="code-example">
+                <pre>print "Enter your age: "
+age = gets.chomp.to_i  # Convert to integer
+puts "In 5 years, you'll be #{age + 5} years old."</pre>
+            </div>
+            
+            <h3>Working with Files</h3>
+            
+            <h4>Reading from a File</h4>
+            <div class="code-example">
+                <pre># Reading entire file at once
+content = File.read("example.txt")
+puts content
+
+# Reading line by line
+File.foreach("example.txt") do |line|
+  puts line
+end
+
+# Using File.open with a block
+File.open("example.txt", "r") do |file|
+  while line = file.gets
+    puts line
+  end
+end  # File is automatically closed when the block ends</pre>
+            </div>
+            
+            <h4>Writing to a File</h4>
+            <div class="code-example">
+                <pre># Writing to a file (overwrites existing content)
+File.write("output.txt", "Hello, Ruby!")
+
+# Appending to a file
+File.open("output.txt", "a") do |file|
+  file.puts "This is a new line"
+end
+
+# Creating a new file with multiple lines
+File.open("new_file.txt", "w") do |file|
+  file.puts "Line 1"
+  file.puts "Line 2"
+  file.puts "Line 3"
+end</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Interactive Journal</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Asks the user for their name</li>
+                    <li>Displays a welcome message</li>
+                    <li>Asks the user to enter a journal entry for today</li>
+                    <li>Saves the entry to a file named with today's date (e.g., "2025-05-27-journal.txt")</li>
+                    <li>Displays a confirmation message with the number of characters in their entry</li>
+                </ol>
+                <p>Bonus: Add an option to read previous journal entries by entering a date.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('interactive-journal', event)">Show Solution</button>
+                <div id="interactive-journal" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 1: Mini Project - Interactive Journal
+
+# Ask the user for their name
+puts "Welcome to your Interactive Journal!"
+print "Please enter your name: "
+user_name = gets.chomp
+
+# Display a welcome message
+puts "Hello, #{user_name}! Let's write in your journal today."
+
+# Get today's date
+require 'date'
+today = Date.today
+date_string = today.strftime("%Y-%m-%d")
+
+# Ask user for journal entry
+puts "Please enter your journal entry for today (#{date_string}):"
+puts "(Press Enter twice when finished)"
+
+# Collect the entry (continue until user enters a blank line)
+entry_lines = []
+while true
+  line = gets.chomp
+  break if line.empty?
+  entry_lines << line
+end
+
+journal_entry = entry_lines.join("\n")
+
+# Save entry to a file
+filename = "#{date_string}-journal.txt"
+File.open(filename, "w") do |file|
+  file.puts "Date: #{date_string}"
+  file.puts "Name: #{user_name}"
+  file.puts "Entry:"
+  file.puts journal_entry
+end
+
+# Display confirmation message
+puts "Journal entry saved to #{filename} (#{journal_entry.length} characters)"
+</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Basic Operators</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

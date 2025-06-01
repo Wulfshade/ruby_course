@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Methods and Blocks - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Methods and Blocks</h1>
+        <p>Learn about Ruby's functions and code blocks</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">Defining Methods</button>
+                <button class="topic-btn" data-target="topic2">Parameters and Arguments</button>
+                <button class="topic-btn" data-target="topic3">Blocks, Procs, and Lambdas</button>
+                <button class="topic-btn" data-target="topic4">Yield and Closures</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>Defining Methods</h2>
+            
+            <h3>Basic Method Definition</h3>
+            <p>Methods in Ruby are defined using the <code>def</code> keyword and end with the <code>end</code> keyword.</p>
+            
+            <div class="code-example">
+                <pre># Basic method definition
+def greet
+  puts "Hello, world!"
+end
+
+# Calling the method
+greet  # => Hello, world!</pre>
+            </div>
+            
+            <h3>Methods with Return Values</h3>
+            <p>Methods can return values. The value of the last expression evaluated is automatically returned.</p>
+            
+            <div class="code-example">
+                <pre># Method with an implicit return value
+def add(a, b)
+  a + b  # This value is automatically returned
+end
+
+sum = add(3, 4)  # => 7
+
+# Method with an explicit return
+def max(a, b)
+  if a > b
+    return a  # Explicit return statement
+  end
+  b  # This is returned if a is not greater than b
+end
+
+max(5, 10)  # => 10
+max(10, 5)  # => 10</pre>
+            </div>
+            
+            <h3>Method Naming Conventions</h3>
+            <p>Ruby method names follow specific conventions:</p>
+            <ul>
+                <li>Method names should be lowercase</li>
+                <li>Words in method names are separated by underscores (snake_case)</li>
+                <li>Methods that test for something often end with a question mark (<code>?</code>)</li>
+                <li>Methods that modify the object they're called on often end with an exclamation mark (<code>!</code>)</li>
+            </ul>
+            
+            <div class="code-example">
+                <pre># Standard method name
+def calculate_total(prices)
+  prices.sum
+end
+
+# Predicate method (returns true or false)
+def valid?(input)
+  !input.nil? && input.length > 0
+end
+
+# Dangerous/destructive method
+def reverse_words!(string)
+  string.replace(string.split(' ').reverse.join(' '))
+end</pre>
+            </div>
+            
+            <h3>Method Scope</h3>
+            <p>Methods create their own scope for local variables.</p>
+            
+            <div class="code-example">
+                <pre>x = 10  # global variable
+
+def print_value
+  x = 5  # local variable, not the same as the x outside the method
+  puts x
+end
+
+print_value  # => 5
+puts x       # => 10 (the outer x is unchanged)</pre>
+            </div>
+            
+            <h3>Method Visibility</h3>
+            <p>Ruby provides three levels of method visibility:</p>
+            <ul>
+                <li><code>public</code>: Accessible from anywhere (default)</li>
+                <li><code>protected</code>: Accessible only by instances of the same class</li>
+                <li><code>private</code>: Accessible only within the defining class</li>
+            </ul>
+            
+            <div class="code-example">
+                <pre>class Person
+  def initialize(name)
+    @name = name
+  end
+  
+  # Public method (default)
+  def greet
+    "Hello, I'm #{@name}."
+  end
+  
+  # Private methods
+  private
+  
+  def secret_identity
+    "I'm actually a superhero!"
+  end
+end
+
+person = Person.new("Alice")
+puts person.greet            # => "Hello, I'm Alice."
+puts person.secret_identity  # => Error: private method `secret_identity' called</pre>
+            </div>
+            
+            <h3>Method Aliasing</h3>
+            <p>Ruby allows you to create aliases for methods:</p>
+            
+            <div class="code-example">
+                <pre>def original_method
+  "Original result"
+end
+
+# Create an alias
+alias new_method original_method
+
+puts original_method  # => "Original result"
+puts new_method       # => "Original result"</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Calculator Library</h4>
+                <p>Create a Ruby file called <code>calculator.rb</code> that:</p>
+                <ol>
+                    <li>Defines methods for basic mathematical operations:
+                        <ul>
+                            <li><code>add(a, b)</code></li>
+                            <li><code>subtract(a, b)</code></li>
+                            <li><code>multiply(a, b)</code></li>
+                            <li><code>divide(a, b)</code> (handle division by zero)</li>
+                        </ul>
+                    </li>
+                    <li>Defines more advanced methods:
+                        <ul>
+                            <li><code>power(base, exponent)</code></li>
+                            <li><code>square_root(number)</code></li>
+                            <li><code>factorial(n)</code></li>
+                        </ul>
+                    </li>
+                    <li>Creates a method called <code>calculate(a, operator, b)</code> that uses the appropriate method based on the operator string</li>
+                </ol>
+                <p>Then write a test script that uses these methods to perform calculations and displays the results.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('calculator-library', event)">Show Solution</button>
+                <div id="calculator-library" class="solution-content" style="display: none;">
+                    <h5>Solution: calculator.rb</h5>
+                    <pre><code class="language-ruby"># Chapter 4: Mini Project - Calculator Library
+
+# Define methods for basic mathematical operations
+
+# Addition method
+def add(a, b)
+  a + b
+end
+
+# Subtraction method
+def subtract(a, b)
+  a - b
+end
+
+# Multiplication method
+def multiply(a, b)
+  a * b
+end
+
+# Division method with division by zero handling
+def divide(a, b)
+  # Check if divisor is zero
+  if b == 0
+    raise ZeroDivisionError, "Cannot divide by zero"
+  else
+    a.to_f / b
+  end
+end
+
+# Define more advanced methods
+
+# Power method (a^b)
+def power(base, exponent)
+  base ** exponent
+end
+
+# Square root method
+def square_root(number)
+  # Check if the number is negative
+  if number < 0
+    raise ArgumentError, "Cannot calculate square root of negative number"
+  else
+    Math.sqrt(number)
+  end
+end
+
+# Factorial method
+def factorial(n)
+  # Check if n is negative
+  if n < 0
+    raise ArgumentError, "Cannot calculate factorial of negative number"
+  end
+  
+  # Base cases
+  return 1 if n == 0 || n == 1
+  
+  # Recursive calculation
+  n * factorial(n - 1)
+end
+
+# Method to choose the right operation based on operator string
+def calculate(a, operator, b)
+  case operator
+  when "+"
+    add(a, b)
+  when "-"
+    subtract(a, b)
+  when "*", "×"
+    multiply(a, b)
+  when "/", "÷"
+    divide(a, b)
+  when "^", "**"
+    power(a, b)
+  else
+    raise ArgumentError, "Unknown operator: #{operator}"
+  end
+end</code></pre>
+
+                    <h5>Test Script: calculator_test.rb</h5>
+                    <pre><code class="language-ruby"># Test script for the calculator library
+require_relative 'calculator'
+
+# Test basic operations
+puts "==== Basic Operations ===="
+puts "2 + 3 = #{add(2, 3)}"
+puts "5 - 2 = #{subtract(5, 2)}"
+puts "4 * 6 = #{multiply(4, 6)}"
+puts "10 / 2 = #{divide(10, 2)}"
+puts "10 / 3 = #{divide(10, 3)}"
+
+# Test advanced operations
+puts "\n==== Advanced Operations ===="
+puts "2^3 = #{power(2, 3)}"
+puts "√16 = #{square_root(16)}"
+puts "5! = #{factorial(5)}"
+
+# Test the calculate method
+puts "\n==== Using calculate() Method ===="
+puts "4 + 5 = #{calculate(4, "+", 5)}"
+puts "8 - 3 = #{calculate(8, "-", 3)}"
+puts "6 * 7 = #{calculate(6, "*", 7)}"
+puts "9 / 3 = #{calculate(9, "/", 3)}"
+puts "2^4 = #{calculate(2, "^", 4)}"
+
+# Test error handling
+puts "\n==== Error Handling ===="
+begin
+  result = divide(5, 0)
+rescue ZeroDivisionError => e
+  puts "Error caught: #{e.message}"
+end
+
+begin
+  result = square_root(-1)
+rescue ArgumentError => e
+  puts "Error caught: #{e.message}"
+end
+
+begin
+  result = factorial(-3)
+rescue ArgumentError => e
+  puts "Error caught: #{e.message}"
+end
+
+begin
+  result = calculate(4, "?", 2)
+rescue ArgumentError => e
+  puts "Error caught: #{e.message}"
+end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Parameters and Arguments →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Parameters and Arguments</h2>
+            
+            <h3>Basic Parameters</h3>
+            <p>Methods can accept parameters (inputs) that are used within the method body:</p>
+            
+            <div class="code-example">
+                <pre>def greet(name)
+  "Hello, #{name}!"
+end
+
+greet("Ruby")  # => "Hello, Ruby!"</pre>
+            </div>
+            
+            <h3>Default Parameter Values</h3>
+            <p>Parameters can have default values that are used when an argument isn't provided:</p>
+            
+            <div class="code-example">
+                <pre>def greet(name = "World")
+  "Hello, #{name}!"
+end
+
+greet         # => "Hello, World!"
+greet("Ruby") # => "Hello, Ruby!"</pre>
+            </div>
+            
+            <h3>Variable Number of Arguments</h3>
+            <p>Ruby allows methods to accept a variable number of arguments using the splat operator (<code>*</code>):</p>
+            
+            <div class="code-example">
+                <pre># The *args parameter collects all remaining arguments into an array
+def sum(*numbers)
+  numbers.sum
+end
+
+sum(1, 2)      # => 3
+sum(1, 2, 3, 4) # => 10
+sum             # => 0 (empty array)</pre>
+            </div>
+            
+            <h3>Keyword Arguments</h3>
+            <p>Ruby 2.0+ supports keyword arguments, which make method calls more explicit and allow for better defaults:</p>
+            
+            <div class="code-example">
+                <pre># Method with keyword arguments
+def connect(host: "localhost", port: 80, user: nil, password: nil)
+  puts "Connecting to #{host}:#{port} as #{user}"
+  # Connection logic here
+end
+
+# Calling with keyword arguments
+connect(host: "example.com", port: 443, user: "admin")
+
+# Providing arguments in any order
+connect(user: "guest", host: "test.com")</pre>
+            </div>
+            
+            <h3>Required Keyword Arguments</h3>
+            <p>You can specify that certain keyword arguments are required:</p>
+            
+            <div class="code-example">
+                <pre>def process_payment(amount:, currency: "USD", method:)
+  puts "Processing #{currency} #{amount} via #{method}"
+end
+
+# This works
+process_payment(amount: 100, method: "credit_card")
+
+# This raises an ArgumentError
+process_payment(currency: "EUR", method: "paypal")  # missing required keyword: amount</pre>
+            </div>
+            
+            <h3>Mixing Argument Types</h3>
+            <p>Ruby allows you to mix different types of arguments, but they must be in a specific order:</p>
+            
+            <div class="code-example">
+                <pre># Order: required, optional, variable, keyword
+def complex_method(a, b = 1, *c, d: nil, **e)
+  puts "a: #{a}"
+  puts "b: #{b}"
+  puts "c: #{c.inspect}"
+  puts "d: #{d}"
+  puts "e: #{e.inspect}"
+end
+
+complex_method(10, 20, 30, 40, d: 50, x: 60, y: 70)
+# Output:
+# a: 10
+# b: 20
+# c: [30, 40]
+# d: 50
+# e: {:x=>60, :y=>70}</pre>
+            </div>
+            
+            <h3>Double Splat Operator</h3>
+            <p>The double splat (<code>**</code>) operator collects keyword arguments into a hash:</p>
+            
+            <div class="code-example">
+                <pre>def options(**kwargs)
+  puts "Options: #{kwargs.inspect}"
+end
+
+options(a: 1, b: 2)  # => "Options: {:a=>1, :b=>2}"</pre>
+            </div>
+            
+            <h3>Passing Arrays as Individual Arguments</h3>
+            <p>The splat operator can also be used to convert an array into individual arguments:</p>
+            
+            <div class="code-example">
+                <pre>def add(a, b, c)
+  a + b + c
+end
+
+numbers = [1, 2, 3]
+add(*numbers)  # => 6 (equivalent to add(1, 2, 3))</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Chronicle Your D&D Adventure</h4>
+                <p>Your quest is to forge a Ruby script that logs the details of a D&D adventure. This will test your mastery of Ruby's versatile method parameters.</p>
+                <p>Your task is to create a method <code>log_adventure</code> that accepts various details about an adventure:</p>
+                <ol>
+                    <li>The main <code>hero</code> (a required positional argument).</li>
+                    <li>An optional <code>sidekick</code> (a positional argument with a default value, e.g., "None").</li>
+                    <li>A variable number of <code>monsters</code> encountered (using the splat operator <code>*</code> to capture them as an array).</li>
+                    <li>A <code>weapon</code> used (a required keyword argument).</li>
+                    <li>An optional <code>shield</code> (a keyword argument with a default value, e.g., "Iron Shield").</li>
+                    <li>Any additional <code>loot</code> collected (using the double splat operator <code>**</code> to capture them as a hash).</li>
+                    <li>An optional <code>callback</code> block (using <code>&</code>) to be executed after logging the adventure (e.g., to announce victory or defeat).</li>
+                </ol>
+                <p>The method should print a summary of the adventure. Test your <code>log_adventure</code> method by calling it with different combinations of arguments to simulate various scenarios.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('dnd-adventure-log', event)">Show Solution</button>
+                <div id="dnd-adventure-log" class="solution-content" style="display: none;">
+                    <h5>Solution: D&D Adventure Log</h5>
+                    <pre><code class="language-ruby"># Chapter 4: Mini Project - D&D Adventure Log
+
+def log_adventure(hero, sidekick = "None", *monsters, weapon:, shield: "Iron Shield", **loot, &callback)
+  puts "=== Adventure Log ==="
+  puts "Hero: #{hero}"
+  puts "Sidekick: #{sidekick}"
+  
+  if monsters.any?
+    puts "Monsters Encountered: #{monsters.join(', ')}"
+  else
+    puts "Monsters Encountered: None (a peaceful journey?)"
+  end
+  
+  puts "Equipped: #{weapon} (Weapon), #{shield} (Shield)"
+  
+  if loot.any?
+    puts "Loot Acquired:"
+    loot.each do |item, description|
+      puts "  - #{item.to_s.capitalize}: #{description}"
+    end
+  else
+    puts "Loot Acquired: None"
+  end
+  
+  # Execute the callback if provided
+  if callback
+    puts "\n--- Quest Outcome ---"
+    callback.call
+  end
+  puts "=====================\n\n"
+end
+
+# --- Test Cases ---
+
+# Scenario 1: Solo hero, basic gear, one monster, some loot, victory message
+log_adventure(
+  "Sir Reginald the Bold", 
+  weapon: "Longsword of Justice", 
+  shield: "Kite Shield", 
+  "Goblin Scout", 
+  gold: 50, 
+  map_fragment: "Path to the Hidden Temple"
+) { puts "Sir Reginald stands victorious over the vanquished goblin!" }
+
+# Scenario 2: Hero with sidekick, multiple monsters, default shield, no extra loot, different outcome
+log_adventure(
+  "Elara Meadowlight", 
+  "Pip Quickwit", 
+  "Giant Spider", "Cave Bat", "Shadow Imp",
+  weapon: "Enchanted Shortbow"
+) { puts "Elara and Pip barely escaped the dark cavern, vowing to return stronger." }
+
+# Scenario 3: Hero, no sidekick, no monsters, custom shield, specific loot
+log_adventure(
+  "Borin Stonebeard",
+  weapon: "Warhammer of the Ancients",
+  shield: "Dwarven Tower Shield",
+  ancient_relic: "Gem of Seeing",
+  rations: "3 days worth"
+) { puts "Borin found valuable supplies and a mysterious relic." }
+
+# Scenario 4: Minimal call (only required arguments)
+log_adventure("Mysterious Stranger", weapon: "Dagger")</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Defining Methods</button>
+                <button class="btn next-btn">Next: Blocks, Procs, and Lambdas →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Blocks, Procs, and Lambdas</h2>
+            
+            <h3>Blocks</h3>
+            <p>The simplest definition of a block is a snippet of code created to be executed later. Blocks are one of Ruby's most powerful features and are enclosed between curly braces <code>{}</code> or the keywords <code>do</code> and <code>end</code>.</p>
+            
+            <div class="code-example">
+                <pre># Block with do...end syntax (multi-line)
+[1, 2, 3].each do |number|
+  puts number * 2
+end
+
+# Block with curly braces syntax (single-line)
+[1, 2, 3].map { |number| number * 2 }  # => [2, 4, 6]</pre>
+            </div>
+            
+            <p>You can think of a block like the body of a method. Like a method, it can take multiple parameters, which are defined between two pipe characters <code>|argument1, argument2, ...|</code>.</p>
+            
+            <h3>Explicit Block Calls</h3>
+            <p>There are two ways to pass a block to your method: explicit or implicit. With the explicit method, you capture the block as a parameter using <code>&block</code>:</p>
+            
+            <div class="code-example">
+                <pre># Explicit block parameter
+def my_method(&block)
+  block.call
+end
+
+my_method { puts 'Hello World!' }
+# Output:
+# Hello World!
+
+# You can call the block multiple times
+def my_method(&block)
+  block.call
+  block.call
+  block.call
+end
+
+my_method { puts 'Hello World!' }
+# Output:
+# Hello World!
+# Hello World!
+# Hello World!</pre>
+            </div>
+            
+            <p>Important notes about explicit blocks:</p>
+            <ul>
+                <li>If you call a method with an explicit block parameter without passing a block, no error occurs, but <code>block</code> will be <code>nil</code></li>
+                <li><code>&block</code> is just a convention; you can use any parameter name</li>
+                <li>You can execute the block as many times as needed with <code>block.call</code></li>
+            </ul>
+            
+            <h3>Implicit Block Calls</h3>
+            <p>Implicit block passing works by calling the <code>yield</code> keyword inside your method. The <code>yield</code> keyword finds and calls a passed block without needing to define it as a parameter:</p>
+            
+            <div class="code-example">
+                <pre># Implicit block with yield
+def my_method
+  yield
+end
+
+my_method { puts 'Hello World!' }
+# Output:
+# Hello World!
+
+# You can check if a block was provided
+def optional_block
+  if block_given?
+    yield
+  else
+    puts "No block given"
+  end
+end
+
+optional_block                   # => "No block given"
+optional_block { puts "Hello" }  # => "Hello"</pre>
+            </div>
+            
+            <h3>Passing Parameters to Blocks</h3>
+            <p>You can pass parameters to blocks with both explicit and implicit methods:</p>
+            
+            <div class="code-example">
+                <pre># Explicit version
+def explicit_version(&block)
+  block.call(1)
+  block.call(2)
+  block.call(3)
+end
+
+explicit_version { |number| puts number * 2 }
+# Output:
+# 2
+# 4
+# 6
+
+# Implicit version
+def implicit_version
+  yield 1
+  yield 2
+  yield 3
+end
+
+implicit_version { |number| puts number * 2 }
+# Output:
+# 2
+# 4
+# 6</pre>
+            </div>
+            
+            <h3>Procs (Procedures)</h3>
+            <p>A Proc is essentially a block that can be stored in a variable. To create a proc, you call <code>Proc.new</code> and pass it a block. This allows blocks to be reused and passed around as objects.</p>
+            
+            <div class="code-example">
+                <pre># Creating a Proc
+proc = Proc.new { puts "Hello World!" }
+proc.call
+# Output:
+# Hello World!
+
+# Procs as method arguments
+def my_method(print_hello, print_number)
+  print_hello.call
+  print_number.call(2)
+end
+
+print_hello = Proc.new { puts "Hello World!" }
+print_number = Proc.new { |n| puts n }
+my_method(print_hello, print_number)
+# Output:
+# Hello World!
+# 2</pre>
+            </div>
+            
+            <h3>Symbol#to_proc</h3>
+            <p>Hashes, symbols, and methods can be converted to procs using their <code>#to_proc</code> methods. This is commonly used with methods like <code>map</code>:</p>
+            
+            <div class="code-example">
+                <pre># Converting symbols to procs with &:
+numbers = [1, 2, 3]
+
+# These are equivalent:
+numbers.map { |n| n.to_s }
+numbers.map(&:to_s)  # => ["1", "2", "3"]
+
+# What happens behind the scenes:
+# 1. &:to_s tells Ruby to call :to_s.to_proc
+# 2. This creates a proc that calls the to_s method on its argument
+# 3. The proc is passed as a block to map</pre>
+            </div>
+            
+            <h3>Lambdas</h3>
+            <p>A lambda is a special type of proc that behaves more like a regular method. There are two ways to create lambdas:</p>
+            
+            <div class="code-example">
+                <pre># Creating a lambda with the lambda method
+square_lambda = lambda { |x| x * x }
+
+# Creating a lambda with the -> syntax (stabby lambda)
+cube_lambda = ->(x) { x * x * x }
+
+# Calling lambdas
+square_lambda.call(5)  # => 25
+cube_lambda.call(3)    # => 27</pre>
+            </div>
+            
+            <h3>Key Differences Between Procs and Lambdas</h3>
+            
+            <div class="code-example">
+                <pre># 1. Argument checking
+# Lambdas check the number of arguments (like methods)
+lambda_demo = lambda { |x, y| "x: #{x}, y: #{y}" }
+# lambda_demo.call(1)  # ArgumentError: wrong number of arguments
+
+# Procs don't check argument count
+proc_demo = Proc.new { |x, y| "x: #{x}, y: #{y}" }
+proc_demo.call(1)      # => "x: 1, y: " (no error)
+
+# 2. Return behavior
+# Procs return from the current context
+def proc_return
+  puts "Before proc"
+  my_proc = Proc.new { return "Proc return" }
+  my_proc.call
+  puts "After proc"  # This line never executes
+  "Method return"    # This line never executes
+end
+
+# Lambdas return like regular methods
+def lambda_return
+  puts "Before lambda"
+  my_lambda = lambda { return "Lambda return" }
+  result = my_lambda.call
+  puts "After lambda: #{result}"
+  "Method return"
+end
+
+puts proc_return     # => "Proc return"
+puts lambda_return   # => "Method return"</pre>
+            </div>
+            
+            <h3>Summary of Differences</h3>
+            <ul>
+                <li>Lambdas are defined with <code>-> {}</code> or <code>lambda {}</code> and procs with <code>Proc.new {}</code></li>
+                <li>Procs return from the current context, while lambdas return just like methods</li>
+                <li>Procs don't care about the correct number of arguments, while lambdas will raise an exception if called with the wrong number of arguments</li>
+            </ul>
+            
+            <h3>Closures</h3>
+            <p>Ruby procs and lambdas are closures, meaning they remember the context (variables and methods) from where they were created. They carry references to these variables, not just their values:</p>
+            
+            <div class="code-example">
+                <pre>def my_method(my_proc)
+  count = 3
+  my_proc.call
+end
+
+count = 1
+my_proc = Proc.new { puts count }
+count = 2
+puts my_method(my_proc)
+# Output:
+# 2</pre>
+            </div>
+            
+            <p>In this example, the proc uses the latest value of <code>count</code> (which is 2), not the value when it was created (1), and it ignores the local <code>count</code> variable inside the method.</p>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Custom Iterator</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Defines a <code>MyEnumerable</code> module with methods like:
+                        <ul>
+                            <li><code>my_each</code> - mimics the behavior of <code>each</code></li>
+                            <li><code>my_map</code> - mimics the behavior of <code>map</code></li>
+                            <li><code>my_select</code> - mimics the behavior of <code>select</code></li>
+                            <li><code>my_reduce</code> - mimics the behavior of <code>reduce</code></li>
+                        </ul>
+                    </li>
+                    <li>Creates a <code>MyArray</code> class that includes your <code>MyEnumerable</code> module</li>
+                    <li>Demonstrates your implementation with examples</li>
+                </ol>
+                <p>This project will help you understand how Ruby's built-in enumerable methods work under the hood by implementing them yourself.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('custom-iterator', event)">Show Solution</button>
+                <div id="custom-iterator" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 4: Mini Project - Custom Iterator
+
+# Define the MyEnumerable module
+module MyEnumerable
+  # my_each method - mimics each
+  # Expects the class including this module to have a method 'size' and a way to access elements by index
+  def my_each
+    return enum_for(:my_each) unless block_given?
+    
+    i = 0
+    while i < size
+      yield self[i]
+      i += 1
+    end
+    
+    self  # Return the original object (like Ruby's each)
+  end
+  
+  # my_map method - mimics map
+  def my_map
+    return enum_for(:my_map) unless block_given?
+    
+    result = []
+    my_each do |item|
+      result << yield(item)
+    end
+    
+    result
+  end
+  
+  # my_select method - mimics select
+  def my_select
+    return enum_for(:my_select) unless block_given?
+    
+    result = []
+    my_each do |item|
+      result << item if yield(item)
+    end
+    
+    result
+  end
+  
+  # my_reduce method - mimics reduce/inject
+  def my_reduce(initial = nil)
+    return enum_for(:my_reduce) unless block_given?
+    
+    # If no initial value is provided, use the first element
+    if initial.nil? && size > 0
+      accumulator = self[0]
+      start_index = 1
+    else
+      accumulator = initial
+      start_index = 0
+    end
+    
+    i = start_index
+    while i < size
+      accumulator = yield(accumulator, self[i])
+      i += 1
+    end
+    
+    accumulator
+  end
+  
+  # Additional methods to demonstrate understanding
+  
+  # my_all? method - mimics all?
+  def my_all?
+    return enum_for(:my_all?) unless block_given?
+    
+    my_each do |item|
+      return false unless yield(item)
+    end
+    
+    true
+  end
+  
+  # my_any? method - mimics any?
+  def my_any?
+    return enum_for(:my_any?) unless block_given?
+    
+    my_each do |item|
+      return true if yield(item)
+    end
+    
+    false
+  end
+  
+  # my_count method - mimics count
+  def my_count
+    if block_given?
+      count = 0
+      my_each do |item|
+        count += 1 if yield(item)
+      end
+      count
+    else
+      size
+    end
+  end
+end
+
+# Create a MyArray class that includes MyEnumerable
+class MyArray
+  include MyEnumerable
+  
+  attr_reader :array
+  
+  def initialize(array = [])
+    @array = array
+  end
+  
+  # Implement necessary methods for MyEnumerable to work
+  def [](index)
+    @array[index]
+  end
+  
+  def size
+    @array.size
+  end
+  
+  # Add additional methods for array-like behavior
+  def to_s
+    @array.to_s
+  end
+  
+  def inspect
+    "MyArray#{@array.inspect}"
+  end
+  
+  def <<(item)
+    @array << item
+    self
+  end
+end
+
+# Demonstrate implementation with examples
+puts "===== Custom Iterator Examples ====="
+
+# Create a new MyArray with some test data
+numbers = MyArray.new([1, 2, 3, 4, 5])
+puts "Original array: #{numbers}"
+
+# Demonstrate my_each
+print "my_each output: "
+numbers.my_each { |n| print "#{n} " }
+puts ""
+
+# Demonstrate my_map
+my_map_result = numbers.my_map { |n| n * 2 }
+puts "my_map (double each number): #{my_map_result.inspect}"
+
+# Demonstrate my_select
+my_select_result = numbers.my_select { |n| n.even? }
+puts "my_select (even numbers): #{my_select_result.inspect}"
+
+# Demonstrate my_reduce
+sum = numbers.my_reduce { |acc, n| acc + n }
+puts "my_reduce (sum): #{sum}"
+
+product = numbers.my_reduce(1) { |acc, n| acc * n }
+puts "my_reduce (product with initial value 1): #{product}"
+
+# Demonstrate additional methods
+puts "\n===== Additional Methods ====="
+puts "my_all? (all > 0): #{numbers.my_all? { |n| n > 0 }}"
+puts "my_all? (all > 3): #{numbers.my_all? { |n| n > 3 }}"
+puts "my_any? (any even): #{numbers.my_any? { |n| n.even? }}"
+puts "my_any? (any > 10): #{numbers.my_any? { |n| n > 10 }}"
+puts "my_count: #{numbers.my_count}"
+puts "my_count (even numbers): #{numbers.my_count { |n| n.even? }}"
+
+# Test with more complex example
+puts "\n===== Complex Example ====="
+words = MyArray.new(['apple', 'banana', 'orange', 'kiwi', 'strawberry'])
+
+long_words = words.my_select { |word| word.length > 5 }
+puts "Words longer than 5 characters: #{long_words.inspect}"
+
+upcased_words = words.my_map { |word| word.upcase }
+puts "Upcased words: #{upcased_words.inspect}"
+
+total_length = words.my_reduce(0) { |total, word| total + word.length }
+puts "Total length of all words: #{total_length}"
+
+puts "Any word starting with 'a'?: #{words.my_any? { |word| word.start_with?('a') }}"
+puts "All words end with 'e'?: #{words.my_all? { |word| word.end_with?('e') }}"
+puts "Count of words with 'a': #{words.my_count { |word| word.include?('a') }}"</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Parameters and Arguments</button>
+                <button class="btn next-btn">Next: Yield and Closures →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Yield and Closures</h2>
+            
+            <h3>Yield in Depth</h3>
+            <p>The <code>yield</code> keyword temporarily transfers control from a method to a block:</p>
+            
+            <div class="code-example">
+                <pre>def custom_times(n)
+  i = 0
+  while i < n
+    yield i
+    i += 1
+  end
+end
+
+custom_times(3) { |i| puts "Iteration #{i}" }
+# Output:
+# Iteration 0
+# Iteration 1
+# Iteration 2</pre>
+            </div>
+            
+            <h3>Yielding with Multiple Arguments</h3>
+            <p>You can pass multiple arguments to a block:</p>
+            
+            <div class="code-example">
+                <pre>def process_pairs(array)
+  array.each_slice(2) do |a, b|
+    yield a, b
+  end
+end
+
+numbers = [1, 2, 3, 4, 5, 6]
+process_pairs(numbers) { |a, b| puts "#{a} + #{b} = #{a + b}" }
+# Output:
+# 1 + 2 = 3
+# 3 + 4 = 7
+# 5 + 6 = 11</pre>
+            </div>
+            
+            <h3>Capturing the Block Return Value</h3>
+            <p>The <code>yield</code> statement returns the value of the last statement executed in the block:</p>
+            
+            <div class="code-example">
+                <pre>def map_values(array)
+  result = []
+  array.each do |item|
+    # Capture the return value of the block
+    transformed = yield item
+    result << transformed
+  end
+  result
+end
+
+numbers = [1, 2, 3]
+squares = map_values(numbers) { |n| n * n }
+puts squares.inspect  # => [1, 4, 9]</pre>
+            </div>
+            
+            <h3>Closures</h3>
+            <p>Blocks, procs, and lambdas in Ruby are closures, meaning they remember the context in which they were defined:</p>
+            
+            <div class="code-example">
+                <pre>def create_multiplier(factor)
+  # The lambda remembers the 'factor' variable
+  lambda { |number| number * factor }
+end
+
+double = create_multiplier(2)
+triple = create_multiplier(3)
+
+puts double.call(5)  # => 10
+puts triple.call(5)  # => 15</pre>
+            </div>
+            
+            <h3>Block Local Variables</h3>
+            <p>You can specify block-local variables to avoid capturing variables from the outer scope:</p>
+            
+            <div class="code-example">
+                <pre>array = [1, 2, 3]
+x = 10
+
+# Without block-local variables
+array.each do |item|
+  x = item  # This changes the outer x
+end
+puts x  # => 3
+
+# With block-local variables
+x = 10
+array.each do |item; x|  # x is local to the block
+  x = item  # This doesn't affect the outer x
+end
+puts x  # => 10</pre>
+            </div>
+            
+            <h3>Method Objects</h3>
+            <p>You can create an object that represents a method using <code>method</code>:</p>
+            
+            <div class="code-example">
+                <pre>class Calculator
+  def add(a, b)
+    a + b
+  end
+end
+
+calc = Calculator.new
+add_method = calc.method(:add)
+
+puts add_method.call(5, 3)  # => 8</pre>
+            </div>
+            
+            <h3>Passing Blocks to Other Methods</h3>
+            <p>You can pass blocks from one method to another using <code>&</code>:</p>
+            
+            <div class="code-example">
+                <pre>def wrapper
+  puts "Before yield"
+  yield_to_block { yield }  # Pass the block to another method
+  puts "After yield"
+end
+
+def yield_to_block
+  puts "Inside second method"
+  yield
+  puts "Back in second method"
+end
+
+wrapper { puts "Block executed" }
+# Output:
+# Before yield
+# Inside second method
+# Block executed
+# Back in second method
+# After yield</pre>
+            </div>
+            
+            <h3>Domain-Specific Languages (DSLs)</h3>
+            <p>Ruby's block syntax makes it great for creating DSLs:</p>
+            
+            <div class="code-example">
+                <pre>class TaskList
+  def initialize
+    @tasks = []
+  end
+  
+  def task(name, &block)
+    task = Task.new(name)
+    task.instance_eval(&block) if block_given?
+    @tasks << task
+  end
+  
+  def list
+    @tasks.each do |task|
+      puts "#{task.name}: #{task.description}"
+      puts "Assigned to: #{task.assignee}" if task.assignee
+      puts "Due: #{task.due_date}" if task.due_date
+      puts "---"
+    end
+  end
+end
+
+class Task
+  attr_reader :name, :description, :assignee, :due_date
+  
+  def initialize(name)
+    @name = name
+  end
+  
+  def describe(text)
+    @description = text
+  end
+  
+  def assign_to(person)
+    @assignee = person
+  end
+  
+  def due(date)
+    @due_date = date
+  end
+end
+
+# Using the DSL
+tasks = TaskList.new
+
+tasks.task "Complete Ruby Course" do
+  describe "Finish all chapters of the Ruby course"
+  assign_to "John"
+  due "2025-06-15"
+end
+
+tasks.task "Practice Ruby" do
+  describe "Create small projects to practice Ruby concepts"
+  assign_to "Sarah"
+  due "2025-06-30"
+end
+
+tasks.list</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Mini Testing Framework</h4>
+                <p>Create a simple testing framework in Ruby that:</p>
+                <ol>
+                    <li>Allows you to define test cases using blocks</li>
+                    <li>Provides assertion methods to verify expected outcomes</li>
+                    <li>Reports test successes and failures</li>
+                    <li>Uses <code>yield</code> and closures to create a clean API</li>
+                </ol>
+                <p>Example usage:</p>
+                <div class="code-example">
+                    <pre>test_suite "Math Tests" do
+  test "Addition" do
+    assert_equal 4, 2 + 2
+    assert_not_equal 5, 2 + 2
+  end
+  
+  test "Division" do
+    assert_equal 2, 10 / 5
+    assert_raises(ZeroDivisionError) { 5 / 0 }
+  end
+end</pre>
+                </div>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('mini-testing-framework', event)">Show Solution</button>
+                <div id="mini-testing-framework" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 4: Mini Project - Mini Testing Framework
+
+class MiniTest
+  # Class variables to store test results
+  @@total_suites = 0
+  @@total_tests = 0
+  @@total_assertions = 0
+  @@passed_assertions = 0
+  @@failed_assertions = 0
+  
+  # Current test suite and test case names
+  @@current_suite = nil
+  @@current_test = nil
+  
+  # Colors for terminal output
+  COLORS = {
+    red: "\e[31m",
+    green: "\e[32m",
+    yellow: "\e[33m",
+    blue: "\e[34m",
+    reset: "\e[0m"
+  }
+  
+  # Class methods
+  
+  # Define a test suite
+  def self.test_suite(name)
+    @@total_suites += 1
+    @@current_suite = name
+    
+    puts "\n#{COLORS[:blue]}Running test suite: #{name}#{COLORS[:reset]}"
+    puts "#{COLORS[:blue]}#{'-' * (name.length + 20)}#{COLORS[:reset]}"
+    
+    # Yield to the block that contains the tests
+    yield if block_given?
+    
+    # Print suite summary
+    puts "#{COLORS[:blue]}#{'-' * (name.length + 20)}#{COLORS[:reset]}"
+    @@current_suite = nil
+  end
+  
+  # Define a test case
+  def self.test(name)
+    @@total_tests += 1
+    @@current_test = name
+    
+    print "  Test: #{name} ... "
+    
+    begin
+      # Yield to the block that contains the assertions
+      yield if block_given?
+      puts "#{COLORS[:green]}PASS#{COLORS[:reset]}"
+    rescue AssertionError => e
+      puts "#{COLORS[:red]}FAIL#{COLORS[:reset]}"
+      puts "    #{COLORS[:red]}#{e.message}#{COLORS[:reset]}"
+    rescue StandardError => e
+      puts "#{COLORS[:red]}ERROR#{COLORS[:reset]}"
+      puts "    #{COLORS[:red]}Unexpected error: #{e.class} - #{e.message}#{COLORS[:reset]}"
+      puts "    #{COLORS[:red]}#{e.backtrace[0..2].join('\n    ')}#{COLORS[:reset]}"
+    end
+    
+    @@current_test = nil
+  end
+  
+  # Print overall test results
+  def self.print_results
+    puts "\n#{COLORS[:yellow]}Test Results:#{COLORS[:reset]}"
+    puts "  Suites: #{@@total_suites}"
+    puts "  Tests: #{@@total_tests}"
+    puts "  Assertions: #{@@total_assertions}"
+    puts "  #{COLORS[:green]}Passed: #{@@passed_assertions}#{COLORS[:reset]}"
+    puts "  #{COLORS[:red]}Failed: #{@@failed_assertions}#{COLORS[:reset]}"
+    
+    if @@failed_assertions == 0
+      puts "\n#{COLORS[:green]}All tests passed!#{COLORS[:reset]}"
+    else
+      puts "\n#{COLORS[:red]}Tests failed: #{@@failed_assertions} failed assertions#{COLORS[:reset]}"
+    end
+  end
+  
+  # Assertion methods
+  
+  # Assert that two values are equal
+  def self.assert_equal(expected, actual)
+    @@total_assertions += 1
+    
+    if expected == actual
+      @@passed_assertions += 1
+      true
+    else
+      @@failed_assertions += 1
+      raise AssertionError.new("Expected #{expected.inspect} but got #{actual.inspect}")
+    end
+  end
+  
+  # Assert that two values are not equal
+  def self.assert_not_equal(expected, actual)
+    @@total_assertions += 1
+    
+    if expected != actual
+      @@passed_assertions += 1
+      true
+    else
+      @@failed_assertions += 1
+      raise AssertionError.new("Expected #{expected.inspect} to not equal #{actual.inspect}")
+    end
+  end
+  
+  # Assert that a value is true
+  def self.assert(value)
+    @@total_assertions += 1
+    
+    if value
+      @@passed_assertions += 1
+      true
+    else
+      @@failed_assertions += 1
+      raise AssertionError.new("Expected value to be truthy but was #{value.inspect}")
+    end
+  end
+  
+  # Assert that a block raises a specific exception
+  def self.assert_raises(exception_class)
+    @@total_assertions += 1
+    
+    begin
+      yield
+      @@failed_assertions += 1
+      raise AssertionError.new("Expected #{exception_class} to be raised, but nothing was raised")
+    rescue exception_class
+      @@passed_assertions += 1
+      true
+    rescue StandardError => e
+      @@failed_assertions += 1
+      raise AssertionError.new("Expected #{exception_class} to be raised, but got #{e.class}")
+    end
+  end
+  
+  # Custom exception for assertion failures
+  class AssertionError < StandardError; end
+end
+
+# Create global methods that delegate to MiniTest methods
+def test_suite(name, &block)
+  MiniTest.test_suite(name, &block)
+end
+
+def test(name, &block)
+  MiniTest.test(name, &block)
+end
+
+def assert_equal(expected, actual)
+  MiniTest.assert_equal(expected, actual)
+end
+
+def assert_not_equal(expected, actual)
+  MiniTest.assert_not_equal(expected, actual)
+end
+
+def assert(value)
+  MiniTest.assert(value)
+end
+
+def assert_raises(exception_class, &block)
+  MiniTest.assert_raises(exception_class, &block)
+end
+
+# Example usage of the framework
+if __FILE__ == $0
+  # Run some example test suites
+  test_suite "Math Tests" do
+    test "Addition" do
+      assert_equal 4, 2 + 2
+      assert_not_equal 5, 2 + 2
+      assert 1 + 1 == 2
+    end
+    
+    test "Division" do
+      assert_equal 2, 10 / 5
+      assert_raises(ZeroDivisionError) { 5 / 0 }
+    end
+    
+    test "Failing Test" do
+      assert_equal 5, 2 + 2  # This will fail
+    end
+  end
+  
+  test_suite "String Tests" do
+    test "Concatenation" do
+      assert_equal "Hello World", "Hello " + "World"
+    end
+    
+    test "String Methods" do
+      assert_equal "HELLO", "hello".upcase
+      assert_equal 5, "hello".length
+    end
+  end
+  
+  # Print overall results
+  MiniTest.print_results
+end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Blocks, Procs, and Lambdas</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

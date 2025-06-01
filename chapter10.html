@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 10: Metaprogramming - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Chapter 10: Metaprogramming</h1>
+        <p>Learn Ruby's powerful code generation capabilities</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+            <a href="final_project.html" class="btn">Next: Final Project →</a>
+        </div>
+
+        <div class="slides-container">
+            <div class="slide active" id="slide-1">
+                <h2>Introduction to Metaprogramming</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>Metaprogramming is writing code that writes code. It's one of Ruby's most powerful and distinctive features, allowing you to create flexible and dynamic programs.</p>
+                        
+                        <h3>What is Metaprogramming?</h3>
+                        <p>Metaprogramming refers to techniques where a program can:</p>
+                        <ul>
+                            <li>Examine itself (introspection)</li>
+                            <li>Modify its own structure and behavior at runtime</li>
+                            <li>Generate code dynamically</li>
+                            <li>Respond to missing methods or constants</li>
+                        </ul>
+                        
+                        <h3>Why Metaprogramming Matters in Ruby</h3>
+                        <p>Ruby was designed with metaprogramming as a first-class feature, not an afterthought. This has enabled frameworks like Rails to create elegant DSLs and conventions that feel like natural extensions of the language.</p>
+                        
+                        <blockquote>
+                            "Metaprogramming is one of the things that make Ruby unique, powerful, and loved by developers who want to express their ideas in code more naturally."
+                        </blockquote>
+                        
+                        <p>By the end of this chapter, you'll understand how to leverage these powerful techniques in your own code.</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide" disabled>Previous</button>
+                    <span class="slide-indicator">Slide 1 of 6</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-2">
+                <h2>Reflection and Introspection</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>Ruby provides rich capabilities for examining objects, classes, and methods at runtime. This self-examination is the foundation of metaprogramming.</p>
+                        
+                        <h3>Object and Class Introspection</h3>
+                        <p>Ruby provides methods to examine what an object or class can do:</p>
+                        
+                        <div class="code-example">
+                            <pre># Object introspection
+obj = "Hello"
+puts obj.class               # => String
+puts obj.is_a?(String)       # => true
+puts obj.respond_to?(:upcase) # => true
+
+# Class introspection
+puts String.instance_methods(false).sort  # Lists all methods defined directly on String
+puts String.ancestors         # Shows inheritance chain</pre>
+                        </div>
+                        
+                        <h3>Method Introspection</h3>
+                        <p>You can examine methods in detail:</p>
+                        
+                        <div class="code-example">
+                            <pre># Get information about methods
+method = "hello".method(:upcase)
+puts method.owner           # => String
+puts method.parameters      # Shows parameters
+puts method.source_location # Shows where method is defined (if available)</pre>
+                        </div>
+                        
+                        <h3>Variable and Constant Inspection</h3>
+                        <div class="code-example">
+                            <pre>klass = String
+puts klass.constants        # List all constants in String
+puts Module.constants       # List all top-level constants</pre>
+                        </div>
+                        
+                        <p>These introspection capabilities allow your programs to make decisions based on what objects can do rather than what they are, enabling more flexible and reusable code.</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 2 of 6</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-3">
+                <h2>Dynamic Method Generation</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>One of Ruby's most powerful metaprogramming features is the ability to define methods dynamically at runtime.</p>
+                        
+                        <h3>define_method</h3>
+                        <p>The <code>define_method</code> method allows you to create methods dynamically:</p>
+                        
+                        <div class="code-example">
+                            <pre>class Person
+  ATTRIBUTES = [:name, :age, :occupation]
+  
+  # Dynamically define getter and setter methods
+  ATTRIBUTES.each do |attribute|
+    # Define getter
+    define_method(attribute) do
+      instance_variable_get("@#{attribute}")
+    end
+    
+    # Define setter
+    define_method("#{attribute}=") do |value|
+      instance_variable_set("@#{attribute}", value)
+    end
+  end
+end
+
+person = Person.new
+person.name = "Ruby Coder"
+puts person.name  # => "Ruby Coder"</pre>
+                        </div>
+                        
+                        <h3>class_eval and instance_eval</h3>
+                        <p>These methods let you execute code in the context of a class or instance:</p>
+                        
+                        <div class="code-example">
+                            <pre># Add methods to a class after it's defined
+String.class_eval do
+  def palindrome?
+    self == self.reverse
+  end
+end
+
+puts "racecar".palindrome?  # => true
+
+# Add methods to a specific instance
+str = "hello"
+str.instance_eval do
+  def shout
+    upcase + "!"
+  end
+end
+
+puts str.shout  # => "HELLO!"
+# Note: Only this specific instance has the 'shout' method</pre>
+                        </div>
+                        
+                        <p>Dynamic method generation allows you to create concise, DRY code by automating repetitive method definitions.</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 3 of 6</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-4">
+                <h2>method_missing and const_missing</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>Ruby provides special hooks that are called when a method or constant cannot be found, allowing you to handle these cases dynamically.</p>
+                        
+                        <h3>method_missing</h3>
+                        <p>When you call a method that doesn't exist, Ruby calls <code>method_missing</code>. By overriding this method, you can create "ghost methods" that don't actually exist until called:</p>
+                        
+                        <div class="code-example">
+                            <pre>class DynamicFinder
+  def initialize(data)
+    @data = data
+  end
+  
+  def method_missing(name, *args)
+    # Check if the method name matches a pattern
+    if name.to_s =~ /^find_by_(.+)$/
+      # Extract the attribute from the method name
+      attribute = $1
+      
+      # Find the matching items
+      @data.select { |item| item[attribute.to_sym] == args.first }
+    else
+      # If it doesn't match our pattern, use default behavior
+      super
+    end
+  end
+  
+  # Always define respond_to_missing? when overriding method_missing
+  def respond_to_missing?(name, include_private = false)
+    name.to_s.start_with?('find_by_') || super
+  end
+end
+
+users = [
+  {name: "Alice", age: 30, city: "New York"},
+  {name: "Bob", age: 25, city: "Boston"},
+  {name: "Charlie", age: 30, city: "Chicago"}
+]
+
+finder = DynamicFinder.new(users)
+p finder.find_by_age(30)  # Calls method_missing and returns Alice and Charlie
+p finder.find_by_city("Boston")  # Returns Bob</pre>
+                        </div>
+                        
+                        <h3>const_missing</h3>
+                        <p>Similar to <code>method_missing</code>, <code>const_missing</code> is called when Ruby can't find a constant:</p>
+                        
+                        <div class="code-example">
+                            <pre>class Module
+  def const_missing(name)
+    puts "Warning: The constant #{name} doesn't exist!"
+    name.to_s.downcase
+  end
+end
+
+puts UNDEFINED_CONSTANT  # Prints warning and returns "undefined_constant"</pre>
+                        </div>
+                        
+                        <p><strong>Warning:</strong> While powerful, overusing <code>method_missing</code> can make code harder to debug and slower to execute. Use it judiciously!</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 4 of 6</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-5">
+                <h2>Domain Specific Languages (DSLs)</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>Ruby's metaprogramming capabilities make it an excellent language for creating Domain Specific Languages (DSLs) - mini-languages tailored to specific problem domains.</p>
+                        
+                        <h3>What is a DSL?</h3>
+                        <p>A DSL is a specialized language focused on a particular problem domain. Unlike general-purpose languages, DSLs are designed to express solutions in a particular domain's vocabulary and syntax.</p>
+                        
+                        <h3>Internal vs. External DSLs</h3>
+                        <ul>
+                            <li><strong>Internal DSLs</strong> are built within a host language (like Ruby)</li>
+                            <li><strong>External DSLs</strong> have their own custom syntax and parser</li>
+                        </ul>
+                        
+                        <p>Ruby is particularly good for internal DSLs because of its flexible syntax.</p>
+                        
+                        <h3>Ruby DSL Examples</h3>
+                        <p>Many Ruby frameworks leverage DSLs:</p>
+                        <ul>
+                            <li>RSpec for testing</li>
+                            <li>Rails routes and ActiveRecord</li>
+                            <li>Rake for task automation</li>
+                        </ul>
+                        
+                        <h3>Building a Simple DSL</h3>
+                        <div class="code-example">
+                            <pre>class HTMLBuilder
+  def initialize
+    @html = ""
+  end
+  
+  def method_missing(tag_name, attributes = {}, &block)
+    @html << "<#{tag_name}"
+    
+    # Add attributes
+    attributes.each do |key, value|
+      @html << " #{key}=\"#{value}\""
+    end
+    
+    if block_given?
+      @html << ">"
+      # Capture the content from the block
+      content = block.call
+      @html << (content.is_a?(HTMLBuilder) ? content.to_s : content)
+      @html << "</#{tag_name}>"
+    else
+      @html << " />"
+    end
+    
+    self
+  end
+  
+  def text(content)
+    @html << content
+    self
+  end
+  
+  def to_s
+    @html
+  end
+end
+
+# Using our DSL
+html = HTMLBuilder.new
+
+result = html.div(id: "content") do
+  html.h1(class: "title") do
+    html.text("Hello, DSL!")
+  end
+  html.p do
+    html.text("This is a paragraph.")
+  end
+end
+
+puts result.to_s
+# Output: <div id="content"><h1 class="title">Hello, DSL!</h1><p>This is a paragraph.</p></div></pre>
+                        </div>
+                        
+                        <p>DSLs make complex configuration or expression more readable and maintainable by providing a syntax that matches the problem domain.</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 5 of 6</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-6">
+                <h2>Metaprogramming Best Practices</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>While metaprogramming is powerful, it should be used judiciously. Here are some best practices:</p>
+                        
+                        <h3>When to Use Metaprogramming</h3>
+                        <ul>
+                            <li>When you need to eliminate repetitive boilerplate code</li>
+                            <li>When creating a DSL to make code more expressive</li>
+                            <li>When extending or modifying existing classes to add functionality</li>
+                            <li>When building frameworks or libraries for others to use</li>
+                        </ul>
+                        
+                        <h3>When to Avoid Metaprogramming</h3>
+                        <ul>
+                            <li>When simpler solutions would work</li>
+                            <li>When it would make code harder to understand</li>
+                            <li>When performance is critical (some metaprogramming techniques can be slower)</li>
+                            <li>In code that needs to be maintained by developers unfamiliar with metaprogramming</li>
+                        </ul>
+                        
+                        <h3>Guidelines for Clean Metaprogramming</h3>
+                        <ol>
+                            <li>Always implement <code>respond_to_missing?</code> when using <code>method_missing</code></li>
+                            <li>Document your metaprogramming thoroughly</li>
+                            <li>Use introspection methods to ensure you're not overriding existing methods</li>
+                            <li>Prefer <code>define_method</code> over <code>method_missing</code> when possible</li>
+                            <li>Test metaprogrammed code extensively</li>
+                            <li>Keep your metaprogramming code isolated in modules or base classes</li>
+                        </ol>
+                        
+                        <div class="mini-project">
+                            <h4>Mini Project: Attribute Framework</h4>
+                            <p>Create a module that provides enhanced attribute functionality:</p>
+                            <ol>
+                                <li>Create a module called <code>EnhancedAttributes</code></li>
+                                <li>Implement a method <code>attribute</code> that accepts a name and options</li>
+                                <li>Support options like <code>:default</code>, <code>:type</code>, and <code>:validate</code></li>
+                                <li>Add type checking to ensure assigned values match the specified type</li>
+                                <li>Add validation using procs or symbols that refer to methods</li>
+                                <li>Add change tracking to know when attributes have been modified</li>
+                            </ol>
+                            <p>Use metaprogramming techniques to implement this functionality efficiently.</p>
+                        </div>
+                        
+                        <div class="cta-container">
+                            <a href="#" class="btn complete-chapter">Complete Chapter</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 6 of 6</span>
+                    <button class="btn next-slide" disabled>Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

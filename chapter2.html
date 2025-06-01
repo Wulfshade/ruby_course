@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Control Structures - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Control Structures</h1>
+        <p>Master the flow of your Ruby programs</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">Conditional Statements</button>
+                <button class="topic-btn" data-target="topic2">Loops and Iterations</button>
+                <button class="topic-btn" data-target="topic3">Case Statements</button>
+                <button class="topic-btn" data-target="topic4">Boolean Logic</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>Conditional Statements</h2>
+            
+            <h3>if-else Statements</h3>
+            <p>Conditional statements let your code make decisions. The <code>if</code> statement is the most basic form:</p>
+            
+            <div class="code-example">
+                <pre>age = 18
+
+if age >= 18
+  puts "You're an adult!"
+end</pre>
+            </div>
+            
+            <p>Adding an <code>else</code> clause for alternative actions:</p>
+            
+            <div class="code-example">
+                <pre>age = 16
+
+if age >= 18
+  puts "You're an adult!"
+else
+  puts "You're a minor."
+end</pre>
+            </div>
+            
+            <p>For multiple conditions, use <code>elsif</code>:</p>
+            
+            <div class="code-example">
+                <pre>score = 85
+
+if score >= 90
+  puts "Grade: A"
+elsif score >= 80
+  puts "Grade: B"
+elsif score >= 70
+  puts "Grade: C"
+elsif score >= 60
+  puts "Grade: D"
+else
+  puts "Grade: F"
+end</pre>
+            </div>
+            
+            <h3>Inline if Statements</h3>
+            <p>For simple conditions, you can use inline forms:</p>
+            
+            <div class="code-example">
+                <pre># Postfix if
+puts "It's freezing!" if temperature < 0
+
+# Ternary operator: condition ? true_result : false_result
+status = age >= 18 ? "adult" : "minor"</pre>
+            </div>
+            
+            <h3>unless Statement</h3>
+            <p>Ruby provides the <code>unless</code> statement, which is the opposite of <code>if</code>:</p>
+            
+            <div class="code-example">
+                <pre># This:
+unless age >= 18
+  puts "You're not old enough."
+end
+
+# Is equivalent to:
+if !(age >= 18)
+  puts "You're not old enough."
+end</pre>
+            </div>
+            
+            <p>You can also use <code>else</code> with <code>unless</code>:</p>
+            
+            <div class="code-example">
+                <pre>unless user.authenticated?
+  puts "Please log in."
+else
+  puts "Welcome back!"
+end</pre>
+            </div>
+            
+            <p>And the postfix form:</p>
+            
+            <div class="code-example">
+                <pre>puts "Access denied." unless user.authorized?</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Movie Rating System</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Asks the user for their age</li>
+                    <li>Based on the age, displays which movie ratings they are allowed to watch:</li>
+                    <ul>
+                        <li>Ages 0-12: G and PG movies</li>
+                        <li>Ages 13-16: G, PG, and PG-13 movies</li>
+                        <li>Ages 17+: All movies including R and NC-17</li>
+                    </ul>
+                    <li>Asks the user to enter a movie rating, and tells them whether they can watch it or not</li>
+                </ol>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('movie-rating-system', event)">Show Solution</button>
+                <div id="movie-rating-system" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 2: Mini Project - Movie Rating System
+
+# Ask the user for their age
+puts "Welcome to the Movie Rating System!"
+print "Please enter your age: "
+user_age = gets.chomp.to_i
+
+# Based on the age, display which movie ratings they are allowed to watch
+puts "\nBased on your age (#{user_age}), you can watch:"
+
+if user_age >= 0 && user_age <= 12
+  puts "- G rated movies"
+  puts "- PG rated movies"
+elsif user_age >= 13 && user_age <= 16
+  puts "- G rated movies"
+  puts "- PG rated movies"
+  puts "- PG-13 rated movies"
+elsif user_age >= 17
+  puts "- All movie ratings (G, PG, PG-13, R, NC-17)"
+else
+  puts "Invalid age entered."
+  exit
+end
+
+# Ask the user to enter a movie rating
+print "\nEnter a movie rating to check if you can watch it: "
+movie_rating = gets.chomp.upcase
+
+# Tell them whether they can watch it or not
+if movie_rating == "G" || movie_rating == "PG"
+  puts "You can watch #{movie_rating} rated movies!"
+elsif movie_rating == "PG-13"
+  if user_age >= 13
+    puts "You can watch PG-13 rated movies!"
+  else
+    puts "Sorry, you need to be at least 13 years old to watch PG-13 rated movies."
+  end
+elsif movie_rating == "R" || movie_rating == "NC-17"
+  if user_age >= 17
+    puts "You can watch #{movie_rating} rated movies!"
+  else
+    puts "Sorry, you need to be at least 17 years old to watch #{movie_rating} rated movies."
+  end
+else
+  puts "Invalid movie rating! Valid ratings are: G, PG, PG-13, R, NC-17"
+end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Loops and Iterations →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Loops and Iterations</h2>
+            
+            <h3>while Loop</h3>
+            <p>The <code>while</code> loop executes a block of code as long as a condition is true:</p>
+            
+            <div class="code-example">
+                <pre>count = 1
+
+while count <= 5
+  puts "Count: #{count}"
+  count += 1
+end
+
+# Output:
+# Count: 1
+# Count: 2
+# Count: 3
+# Count: 4
+# Count: 5</pre>
+            </div>
+            
+            <h3>until Loop</h3>
+            <p>The <code>until</code> loop is the opposite of <code>while</code>. It executes the block until the condition becomes true:</p>
+            
+            <div class="code-example">
+                <pre>count = 1
+
+until count > 5
+  puts "Count: #{count}"
+  count += 1
+end
+
+# Output is the same as the while example</pre>
+            </div>
+            
+            <h3>for Loop</h3>
+            <p>The <code>for</code> loop iterates over a collection:</p>
+            
+            <div class="code-example">
+                <pre>for i in 1..5
+  puts "Number: #{i}"
+end
+
+# Output:
+# Number: 1
+# Number: 2
+# Number: 3
+# Number: 4
+# Number: 5</pre>
+            </div>
+            
+            <h3>each Method</h3>
+            <p>The most Ruby-like way to iterate is using the <code>each</code> method with a block:</p>
+            
+            <div class="code-example">
+                <pre>fruits = ["apple", "banana", "cherry"]
+
+fruits.each do |fruit|
+  puts "I like #{fruit}!"
+end
+
+# Output:
+# I like apple!
+# I like banana!
+# I like cherry!</pre>
+            </div>
+            
+            <h3>times Method</h3>
+            <p>The <code>times</code> method is a simple way to execute code a specific number of times:</p>
+            
+            <div class="code-example">
+                <pre>5.times do |i|
+  puts "Iteration #{i}"
+end
+
+# Output:
+# Iteration 0
+# Iteration 1
+# Iteration 2
+# Iteration 3
+# Iteration 4</pre>
+            </div>
+            
+            <h3>Loop Control</h3>
+            <p>Ruby provides several ways to control the flow of loops:</p>
+            
+            <h4>break</h4>
+            <p>Exits the loop immediately:</p>
+            
+            <div class="code-example">
+                <pre>i = 0
+while true
+  puts i
+  i += 1
+  break if i >= 5
+end
+
+# Output:
+# 0
+# 1
+# 2
+# 3
+# 4</pre>
+            </div>
+            
+            <h4>next</h4>
+            <p>Skips to the next iteration:</p>
+            
+            <div class="code-example">
+                <pre>5.times do |i|
+  next if i % 2 == 0  # Skip even numbers
+  puts "Odd number: #{i}"
+end
+
+# Output:
+# Odd number: 1
+# Odd number: 3</pre>
+            </div>
+            
+            <h4>redo</h4>
+            <p>Restarts the current iteration:</p>
+            
+            <div class="code-example">
+                <pre>count = 0
+5.times do |i|
+  puts "Iteration #{i}"
+  count += 1
+  redo if count == 2  # When count is 2, restart the current iteration
+  puts "End of iteration #{i}"
+end</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Guessing Game</h4>
+                <p>Create a Ruby script for a number guessing game that:</p>
+                <ol>
+                    <li>Generates a random number between 1 and 100</li>
+                    <li>Asks the user to guess the number</li>
+                    <li>Tells the user if their guess is too high or too low</li>
+                    <li>Continues until the user guesses correctly</li>
+                    <li>Congratulates the user and tells them how many guesses they took</li>
+                </ol>
+                <p>Hint: Use <code>rand(1..100)</code> to generate a random number between 1 and 100.</p>
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('guessing-game', event)">Show Solution</button>
+                <div id="guessing-game" class="solution-content" style="display: none;">
+                    <h5>Solution:</h5>
+                    <pre><code class="language-ruby"># Chapter 2: Mini Project - Guessing Game
+
+puts "Welcome to the Guessing Game!"
+puts "I'm thinking of a number between 1 and 100."
+
+# Generate a random number between 1 and 100
+secret_number = rand(1..100)
+
+# Initialize variables
+guess_count = 0
+guessed_correctly = false
+
+# Game loop continues until the number is guessed correctly
+while !guessed_correctly
+  # Ask for user's guess
+  print "Enter your guess: "
+  user_guess = gets.chomp.to_i
+  guess_count += 1
+  
+  # Provide feedback on the guess
+  if user_guess < secret_number
+    puts "Too low! Try a higher number."
+    
+    # Give a hint after 5 incorrect guesses
+    if guess_count >= 5
+      puts "Hint: The number is higher than #{secret_number - 10 > 0 ? secret_number - 10 : 1}."
+    end
+  elsif user_guess > secret_number
+    puts "Too high! Try a lower number."
+    
+    # Give a hint after 5 incorrect guesses
+    if guess_count >= 5
+      puts "Hint: The number is lower than #{secret_number + 10 < 100 ? secret_number + 10 : 100}."
+    end
+  else
+    guessed_correctly = true
+    puts "Congratulations! You've guessed the number correctly!"
+    puts "The secret number was: #{secret_number}"
+    puts "It took you #{guess_count} #{guess_count == 1 ? 'guess' : 'guesses'} to find it."
+  end
+end</code></pre>
+                </div>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Conditional Statements</button>
+                <button class="btn next-btn">Next: Case Statements →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Case Statements</h2>
+            
+            <h3>Basic Case Statement</h3>
+            <p>The <code>case</code> statement (also known as a switch statement in other languages) provides a cleaner way to express multiple conditions:</p>
+            
+            <div class="code-example">
+                <pre>day = "Monday"
+
+case day
+when "Monday"
+  puts "Start of work week"
+when "Wednesday"
+  puts "Halfway through!"
+when "Friday"
+  puts "TGIF!"
+when "Saturday", "Sunday"
+  puts "Weekend!"
+else
+  puts "Regular day"
+end</pre>
+            </div>
+            
+            <h3>Case with No Arguments</h3>
+            <p>You can use <code>case</code> without an argument to evaluate multiple conditions:</p>
+            
+            <div class="code-example">
+                <pre>score = 85
+
+case
+when score >= 90
+  puts "Grade: A"
+when score >= 80
+  puts "Grade: B"
+when score >= 70
+  puts "Grade: C"
+when score >= 60
+  puts "Grade: D"
+else
+  puts "Grade: F"
+end</pre>
+            </div>
+            
+            <h3>Case with Ranges</h3>
+            <p>You can use ranges in case statements for more concise code:</p>
+            
+            <div class="code-example">
+                <pre>age = 25
+
+case age
+when 0..12
+  puts "Child"
+when 13..19
+  puts "Teenager"
+when 20..64
+  puts "Adult"
+else
+  puts "Senior"
+end</pre>
+            </div>
+            
+            <h3>Case with Pattern Matching</h3>
+            <p>In newer Ruby versions, you can use pattern matching in case statements:</p>
+            
+            <div class="code-example">
+                <pre>data = {name: "Ruby", version: "3.0.0", released: true}
+
+case data
+when {name: "Ruby", version: String => v, released: true}
+  puts "Ruby version #{v} has been released"
+when {name: String => lang, released: false}
+  puts "#{lang} is not released yet"
+else
+  puts "Unknown data format"
+end</pre>
+            </div>
+            
+            <h3>Returning Values</h3>
+            <p>Case statements return a value, so you can assign the result:</p>
+            
+            <div class="code-example">
+                <pre>status = case weather
+          when "sunny"
+            "Wear sunglasses"
+          when "rainy"
+            "Bring an umbrella"
+          when "snowy"
+            "Wear a warm coat"
+          else
+            "Check the forecast"
+          end
+
+puts status</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Simple Calculator</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Asks the user for two numbers</li>
+                    <li>Asks the user for an operation (add, subtract, multiply, divide)</li>
+                    <li>Uses a case statement to perform the correct operation</li>
+                    <li>Displays the result</li>
+                    <li>Handles division by zero appropriately</li>
+                </ol>
+                <p>Bonus: Add support for more operations like exponentiation, modulus, etc.</p>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Loops and Iterations</button>
+                <button class="btn next-btn">Next: Boolean Logic →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Boolean Logic</h2>
+            
+            <h3>Boolean Values</h3>
+            <p>Ruby has two boolean values: <code>true</code> and <code>false</code>. These are instances of <code>TrueClass</code> and <code>FalseClass</code>, respectively.</p>
+            
+            <h3>Truthiness and Falsiness</h3>
+            <p>In Ruby, only <code>false</code> and <code>nil</code> are considered "falsy". Everything else is "truthy", including:</p>
+            <ul>
+                <li>0 (zero)</li>
+                <li>Empty strings ("")</li>
+                <li>Empty arrays ([])</li>
+                <li>Empty hashes ({})</li>
+            </ul>
+            
+            <div class="code-example">
+                <pre>if 0
+  puts "0 is truthy in Ruby"  # This will be printed
+end
+
+if ""
+  puts "Empty string is truthy in Ruby"  # This will be printed
+end
+
+if nil
+  puts "This won't be printed"
+end</pre>
+            </div>
+            
+            <h3>Logical Operators</h3>
+            
+            <h4>AND Operators: <code>&&</code> and <code>and</code></h4>
+            <p>Both operators return <code>true</code> if both operands are truthy:</p>
+            
+            <div class="code-example">
+                <pre>true && true    # => true
+true && false   # => false
+false && true   # => false
+false && false  # => false</pre>
+            </div>
+            
+            <h4>OR Operators: <code>||</code> and <code>or</code></h4>
+            <p>Both operators return <code>true</code> if at least one operand is truthy:</p>
+            
+            <div class="code-example">
+                <pre>true || true    # => true
+true || false   # => true
+false || true   # => true
+false || false  # => false</pre>
+            </div>
+            
+            <h4>NOT Operators: <code>!</code> and <code>not</code></h4>
+            <p>These operators negate the boolean value:</p>
+            
+            <div class="code-example">
+                <pre>!true   # => false
+!false  # => true
+not true   # => false
+not false  # => true</pre>
+            </div>
+            
+            <h3>Short-Circuit Evaluation</h3>
+            <p>Ruby's <code>&&</code> and <code>||</code> operators use short-circuit evaluation:</p>
+            
+            <div class="code-example">
+                <pre>false && puts("This won't be executed")  # The puts is never called
+
+true || puts("This won't be executed")  # The puts is never called</pre>
+            </div>
+            
+            <h3>Operator Precedence</h3>
+            <p>Ruby operators have different precedence levels. In general:</p>
+            <ol>
+                <li><code>!</code> has higher precedence than <code>&&</code></li>
+                <li><code>&&</code> has higher precedence than <code>||</code></li>
+                <li><code>||</code> has higher precedence than <code>and</code>, <code>or</code>, and <code>not</code></li>
+            </ol>
+            
+            <p>Use parentheses when in doubt:</p>
+            
+            <div class="code-example">
+                <pre>result = (a > b) && (c < d)</pre>
+            </div>
+            
+            <h3>Nil Check Pattern</h3>
+            <p>A common pattern in Ruby is using <code>||</code> to provide default values:</p>
+            
+            <div class="code-example">
+                <pre>name = user_input || "Anonymous"
+
+# The above is equivalent to:
+name = if user_input
+          user_input
+        else
+          "Anonymous"
+        end</pre>
+            </div>
+            
+            <h3>Safe Navigation Operator</h3>
+            <p>The <code>&.</code> operator (added in Ruby 2.3) safely navigates through <code>nil</code> values:</p>
+            
+            <div class="code-example">
+                <pre># Without safe navigation
+if user && user.profile && user.profile.address
+  puts user.profile.address.city
+end
+
+# With safe navigation
+puts user&.profile&.address&.city</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Access Control System</h4>
+                <p>Create a Ruby script that:</p>
+                <ol>
+                    <li>Defines a simple user authentication system with username and password</li>
+                    <li>Defines access levels (admin, editor, viewer)</li>
+                    <li>Uses boolean logic to determine if a user can:</li>
+                    <ul>
+                        <li>View content (all users)</li>
+                        <li>Edit content (admin and editor)</li>
+                        <li>Delete content (admin only)</li>
+                    </ul>
+                    <li>Tests various user types against different operations</li>
+                </ol>
+                <p>Bonus: Add a time-based restriction (e.g., certain operations can only be performed during business hours).</p>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Case Statements</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

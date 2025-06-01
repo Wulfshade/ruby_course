@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 7: Test-Driven Development - Learn Ruby</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Test-Driven Development</h1>
+        <p>Learn how to write better code through testing</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+        </div>
+
+        <section class="topic-navigation">
+            <h2>Chapter Topics</h2>
+            <div class="topic-nav">
+                <button class="topic-btn" data-target="topic1">TDD Fundamentals</button>
+                <button class="topic-btn" data-target="topic2">Testing with MiniTest</button>
+                <button class="topic-btn" data-target="topic3">Testing with RSpec</button>
+                <button class="topic-btn" data-target="topic4">Mocking and Stubbing</button>
+            </div>
+        </section>
+
+        <section id="topic1" class="topic-slide">
+            <h2>TDD Fundamentals</h2>
+            
+            <h3>What is Test-Driven Development?</h3>
+            <p>Test-Driven Development (TDD) is a software development process that relies on the repetition of a very short development cycle: first the developer writes a failing automated test case that defines a desired improvement or new function, then produces code to pass that test, and finally refactors the new code to acceptable standards.</p>
+            
+            <h3>The TDD Cycle: Red, Green, Refactor</h3>
+            <div class="code-example">
+                <pre># The TDD cycle consists of three steps:
+#
+# 1. Red: Write a failing test
+# 2. Green: Write the minimum code needed to make the test pass
+# 3. Refactor: Improve the code without changing its behavior</pre>
+            </div>
+            
+            <h3>Benefits of TDD</h3>
+            <ul>
+                <li><strong>Better code design</strong>: TDD encourages writing modular, loosely coupled code</li>
+                <li><strong>Documentation</strong>: Tests serve as living documentation for how code should work</li>
+                <li><strong>Confidence in changes</strong>: Tests catch regressions when making changes</li>
+                <li><strong>Fewer bugs</strong>: Writing tests first helps identify edge cases early</li>
+                <li><strong>Faster development</strong>: In the long run, TDD can speed up development by reducing debugging time</li>
+            </ul>
+            
+            <h3>A Simple TDD Example</h3>
+            <p>Let's implement a simple calculator function using TDD:</p>
+            
+            <div class="code-example">
+                <pre># Step 1: Write a failing test
+require 'minitest/autorun'
+
+class CalculatorTest < Minitest::Test
+  def test_add_two_numbers
+    calculator = Calculator.new
+    result = calculator.add(2, 3)
+    assert_equal 5, result
+  end
+end
+
+# Running this test will fail because we haven't created the Calculator class yet
+
+# Step 2: Write the minimum code to make the test pass
+class Calculator
+  def add(a, b)
+    a + b
+  end
+end
+
+# Now the test will pass
+
+# Step 3: Refactor if needed (our code is simple, so no refactoring needed)</pre>
+            </div>
+            
+            <h3>TDD Best Practices</h3>
+            <ul>
+                <li>Write small, focused tests that test one thing</li>
+                <li>Use descriptive test names that explain what the test is checking</li>
+                <li>Keep tests fast to maintain a quick feedback loop</li>
+                <li>Test behavior, not implementation details</li>
+                <li>Maintain test independence (tests shouldn't depend on each other)</li>
+            </ul>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Calculator TDD</h4>
+                <p>Create a Calculator class using TDD that:</p>
+                <ol>
+                    <li>Implements basic math operations (add, subtract, multiply, divide)</li>
+                    <li>Handles edge cases like division by zero</li>
+                    <li>Includes more advanced functions like power and square root</li>
+                </ol>
+                <p>For each feature:</p>
+                <ol>
+                    <li>Write a failing test first</li>
+                    <li>Implement the minimum code to make the test pass</li>
+                    <li>Refactor your code as needed</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn next-btn">Next: Testing with MiniTest →</button>
+            </div>
+        </section>
+
+        <section id="topic2" class="topic-slide">
+            <h2>Testing with MiniTest</h2>
+            
+            <h3>Introduction to MiniTest</h3>
+            <p>MiniTest is a lightweight testing framework that comes bundled with Ruby. It provides a complete suite of testing facilities including TDD, BDD, mocking, and benchmarking.</p>
+            
+            <div class="code-example">
+                <pre># Using MiniTest is as simple as requiring it
+require 'minitest/autorun'
+
+# This will automatically run your tests when the file is executed</pre>
+            </div>
+            
+            <h3>Writing Tests with MiniTest::Test</h3>
+            <p>The most common way to write tests in MiniTest is using the Test class:</p>
+            
+            <div class="code-example">
+                <pre>require 'minitest/autorun'
+
+class StringTest < Minitest::Test
+  def test_string_length
+    str = "Hello, World!"
+    assert_equal 13, str.length
+  end
+  
+  def test_string_downcase
+    str = "HELLO"
+    assert_equal "hello", str.downcase
+  end
+end</pre>
+            </div>
+            
+            <h3>MiniTest Assertions</h3>
+            <p>MiniTest provides a variety of assertions to validate your code:</p>
+            
+            <div class="code-example">
+                <pre>require 'minitest/autorun'
+
+class AssertionsTest < Minitest::Test
+  def test_assertions
+    # Basic equality
+    assert_equal 4, 2 + 2
+    
+    # Boolean assertions
+    assert true
+    refute false
+    
+    # Nil checking
+    assert_nil nil
+    refute_nil "not nil"
+    
+    # Exception testing
+    assert_raises(ZeroDivisionError) { 1 / 0 }
+    
+    # Including/matching
+    assert_includes [1, 2, 3], 2
+    assert_match /world/, "hello world"
+    
+    # Empty/not empty
+    assert_empty []
+    refute_empty [1, 2, 3]
+    
+    # Type checking
+    assert_instance_of String, "hello"
+    assert_kind_of Numeric, 1
+  end
+end</pre>
+            </div>
+            
+            <h3>Test Setup and Teardown</h3>
+            <p>For tests that need common setup or cleanup:</p>
+            
+            <div class="code-example">
+                <pre>require 'minitest/autorun'
+
+class UserTest < Minitest::Test
+  def setup
+    # Runs before each test
+    @user = User.new("John", "Doe")
+  end
+  
+  def teardown
+    # Runs after each test
+    # Clean up resources, close files, etc.
+  end
+  
+  def test_full_name
+    assert_equal "John Doe", @user.full_name
+  end
+  
+  def test_greeting
+    assert_equal "Hello, John!", @user.greeting
+  end
+end</pre>
+            </div>
+            
+            <h3>Spec-Style Testing with MiniTest</h3>
+            <p>MiniTest also supports a spec-style syntax for BDD-style testing:</p>
+            
+            <div class="code-example">
+                <pre>require 'minitest/autorun'
+
+describe User do
+  before do
+    @user = User.new("John", "Doe")
+  end
+  
+  it "returns full name" do
+    _(@user.full_name).must_equal "John Doe"
+  end
+  
+  it "returns greeting" do
+    _(@user.greeting).must_equal "Hello, John!"
+  end
+end</pre>
+            </div>
+            
+            <h3>Running MiniTest Tests</h3>
+            <p>To run your tests:</p>
+            
+            <div class="code-example">
+                <pre># Run a single test file
+$ ruby test_file.rb
+
+# Using rake to run all tests
+$ rake test
+
+# With options
+$ ruby test_file.rb --seed 12345 --verbose</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Todo List with MiniTest</h4>
+                <p>Create a Todo List application using TDD with MiniTest:</p>
+                <ol>
+                    <li>Create a TodoList class that holds multiple Todo items</li>
+                    <li>Create a Todo class with properties like title, description, and completed status</li>
+                    <li>Implement methods to add, remove, and find Todo items</li>
+                    <li>Implement methods to mark todos as complete or incomplete</li>
+                    <li>Write tests for all functionality using both the Test and Spec styles</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: TDD Fundamentals</button>
+                <button class="btn next-btn">Next: Testing with RSpec →</button>
+            </div>
+        </section>
+
+        <section id="topic3" class="topic-slide">
+            <h2>Testing with RSpec</h2>
+            
+            <h3>Introduction to RSpec</h3>
+            <p>RSpec is a behavior-driven development (BDD) framework for Ruby, inspired by JBehavior. It's the most popular testing framework in the Ruby community and focuses on readability and expressiveness.</p>
+            
+            <div class="code-example">
+                <pre># Installing RSpec
+$ gem install rspec
+
+# Creating a new RSpec project
+$ rspec --init
+
+# This creates:
+# - .rspec (configuration file)
+# - spec/spec_helper.rb (setup file)</pre>
+            </div>
+            
+            <h3>Basic RSpec Structure</h3>
+            <p>RSpec uses a domain-specific language (DSL) to make tests more readable:</p>
+            
+            <div class="code-example">
+                <pre>require 'rspec'
+require_relative '../lib/string_calculator'
+
+describe StringCalculator do
+  describe "#add" do
+    it "returns 0 for an empty string" do
+      calculator = StringCalculator.new
+      expect(calculator.add("")).to eq(0)
+    end
+    
+    it "returns the number for a single number" do
+      calculator = StringCalculator.new
+      expect(calculator.add("1")).to eq(1)
+    end
+    
+    it "returns the sum of two comma-separated numbers" do
+      calculator = StringCalculator.new
+      expect(calculator.add("1,2")).to eq(3)
+    end
+  end
+end</pre>
+            </div>
+            
+            <h3>Key RSpec Concepts</h3>
+            
+            <h4>Describe and Context</h4>
+            <div class="code-example">
+                <pre>describe User do          # Typically describes a class
+  describe "#full_name" do  # '#' indicates an instance method
+    context "with first and last name" do
+      # tests...
+    end
+    
+    context "with only first name" do
+      # tests...
+    end
+  end
+  
+  describe ".create" do     # '.' indicates a class method
+    # tests...
+  end
+end</pre>
+            </div>
+            
+            <h4>Expectations and Matchers</h4>
+            <div class="code-example">
+                <pre># Equality
+expect(actual).to eq(expected)      # == comparison
+expect(actual).to eql(expected)     # eql? comparison
+expect(actual).to be(expected)      # identical object
+
+# Truthiness
+expect(actual).to be_truthy
+expect(actual).to be_falsey
+expect(actual).to be_nil
+
+# Errors
+expect { code_that_raises }.to raise_error
+expect { code_that_raises }.to raise_error(ErrorClass)
+expect { code_that_raises }.to raise_error("message")
+
+# Collections
+expect(collection).to include(item)
+expect(collection).to start_with(item)
+expect(collection).to end_with(item)
+expect(collection).to be_empty
+
+# Predicates
+expect(object).to be_valid          # calls object.valid?
+expect(number).to be_positive       # calls number.positive?
+
+# Change
+expect { object.action }.to change { object.value }
+expect { object.action }.to change { object.value }.from(old).to(new)
+expect { object.action }.to change { object.value }.by(delta)</pre>
+            </div>
+            
+            <h3>Hooks and Shared Context</h3>
+            <p>RSpec provides hooks for setup and teardown, as well as ways to share context between tests:</p>
+            
+            <div class="code-example">
+                <pre># Hooks
+describe User do
+  before(:each) do
+    # Runs before each example
+    @user = User.new("John", "Doe")
+  end
+  
+  after(:each) do
+    # Runs after each example
+  end
+  
+  before(:all) do
+    # Runs once before all examples
+  end
+  
+  after(:all) do
+    # Runs once after all examples
+  end
+  
+  # Examples...
+end
+
+# Shared context
+shared_context "logged in user" do
+  before(:each) do
+    @user = User.create(name: "John")
+    @session = Session.create(user: @user)
+  end
+end
+
+describe Dashboard do
+  include_context "logged in user"
+  
+  it "shows user's name" do
+    # Tests that use @user and @session
+  end
+end</pre>
+            </div>
+            
+            <h3>Running RSpec Tests</h3>
+            
+            <div class="code-example">
+                <pre># Run all specs
+$ rspec
+
+# Run a specific file
+$ rspec spec/models/user_spec.rb
+
+# Run a specific example (line number)
+$ rspec spec/models/user_spec.rb:25
+
+# Run with specific format
+$ rspec --format documentation
+
+# Run with color
+$ rspec --color</pre>
+            </div>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Book Library with RSpec</h4>
+                <p>Create a Book Library system using BDD with RSpec:</p>
+                <ol>
+                    <li>Create a Library class that manages a collection of books</li>
+                    <li>Create a Book class with attributes like title, author, and genre</li>
+                    <li>Implement library features:
+                        <ul>
+                            <li>Add and remove books</li>
+                            <li>Check out and return books</li>
+                            <li>Search for books by title, author, or genre</li>
+                        </ul>
+                    </li>
+                    <li>Use RSpec to test all functionality</li>
+                    <li>Use contexts to test different scenarios</li>
+                    <li>Use shared examples for common behaviors</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Testing with MiniTest</button>
+                <button class="btn next-btn">Next: Mocking and Stubbing →</button>
+            </div>
+        </section>
+
+        <section id="topic4" class="topic-slide">
+            <h2>Mocking and Stubbing</h2>
+            
+            <h3>What Are Mocks and Stubs?</h3>
+            <p>In testing, you often need to isolate the code you're testing from its dependencies. Mocks and stubs are techniques to replace real objects with test doubles:</p>
+            <ul>
+                <li><strong>Stub</strong>: A replacement that provides canned answers to calls made during the test</li>
+                <li><strong>Mock</strong>: A replacement that records calls they receive and can verify expectations about those calls</li>
+            </ul>
+            
+            <h3>Mocking and Stubbing with MiniTest</h3>
+            <p>MiniTest provides built-in support for mocks and stubs:</p>
+            
+            <div class="code-example">
+                <pre>require 'minitest/autorun'
+
+class WeatherServiceTest < Minitest::Test
+  def test_get_temperature_by_city
+    # Create a mock WeatherAPI
+    weather_api = Minitest::Mock.new
+    # Set expectation: city => "London", returns 15
+    weather_api.expect :get_temperature, 15, ["London"]
+    
+    # Inject the mock into our service
+    service = WeatherService.new(weather_api)
+    
+    # Call the method we want to test
+    temperature = service.temperature_in("London")
+    
+    # Verify the result
+    assert_equal 15, temperature
+    
+    # Verify all expected calls were made
+    weather_api.verify
+  end
+  
+  def test_with_stub
+    # Using stub_method
+    weather_api = Object.new
+    def weather_api.get_temperature(city)
+      city == "London" ? 15 : 20
+    end
+    
+    service = WeatherService.new(weather_api)
+    assert_equal 15, service.temperature_in("London")
+    assert_equal 20, service.temperature_in("Paris")
+  end
+end</pre>
+            </div>
+            
+            <h3>Mocking and Stubbing with RSpec</h3>
+            <p>RSpec provides powerful tools for mocks and stubs:</p>
+            
+            <div class="code-example">
+                <pre>require 'rspec'
+
+describe WeatherService do
+  describe "#temperature_in" do
+    it "returns the temperature for a city" do
+      # Create a double (mock object)
+      weather_api = double("WeatherAPI")
+      
+      # Define the behavior
+      allow(weather_api).to receive(:get_temperature).with("London").and_return(15)
+      
+      # Inject the double
+      service = WeatherService.new(weather_api)
+      
+      # Test the method
+      expect(service.temperature_in("London")).to eq(15)
+    end
+    
+    it "verifies calls with expectations" do
+      weather_api = double("WeatherAPI")
+      
+      # Set an expectation that must be fulfilled
+      expect(weather_api).to receive(:get_temperature).with("London").and_return(15)
+      
+      service = WeatherService.new(weather_api)
+      service.temperature_in("London")
+      
+      # RSpec will verify that weather_api.get_temperature("London") was called
+    end
+  end
+end</pre>
+            </div>
+            
+            <h3>Partial Mocks and Method Stubs</h3>
+            <p>Sometimes you want to mock or stub just one method on a real object:</p>
+            
+            <div class="code-example">
+                <pre># With RSpec
+describe User do
+  it "sends a welcome email" do
+    user = User.new("test@example.com")
+    
+    # Stub the send_email method
+    allow(user).to receive(:send_email).and_return(true)
+    
+    # Or expect it to be called
+    expect(user).to receive(:send_email).with("Welcome!", anything).once
+    
+    user.register
+  end
+end
+
+# With MiniTest
+def test_sends_welcome_email
+  user = User.new("test@example.com")
+  
+  # Stub method
+  user.stub :send_email, true do
+    result = user.register
+    assert result
+  end
+end</pre>
+            </div>
+            
+            <h3>When to Use Mocks and Stubs</h3>
+            <ul>
+                <li><strong>External Services</strong>: APIs, databases, third-party services</li>
+                <li><strong>Slow Operations</strong>: File I/O, network requests</li>
+                <li><strong>Non-deterministic Behavior</strong>: Time, random numbers</li>
+                <li><strong>Complex Setup</strong>: When real objects require complex setup</li>
+                <li><strong>Triggering Edge Cases</strong>: Error conditions, rare scenarios</li>
+            </ul>
+            
+            <h3>Best Practices</h3>
+            <ul>
+                <li>Don't mock what you don't own (external libraries)</li>
+                <li>Mock interfaces, not implementations</li>
+                <li>Don't overuse mocks - they can make tests brittle</li>
+                <li>Use mocks to test interactions between objects</li>
+                <li>Use stubs to simplify tests and isolate components</li>
+            </ul>
+            
+            <div class="mini-project">
+                <h4>Mini Project: Payment Processor</h4>
+                <p>Create a payment processing system using TDD with mocks and stubs:</p>
+                <ol>
+                    <li>Create a PaymentProcessor class that processes payments through a PaymentGateway</li>
+                    <li>The PaymentGateway represents an external API that:
+                        <ul>
+                            <li>Authenticates with API credentials</li>
+                            <li>Charges credit cards</li>
+                            <li>Refunds payments</li>
+                            <li>Can fail for various reasons (invalid card, network error, etc.)</li>
+                        </ul>
+                    </li>
+                    <li>Write tests for the PaymentProcessor using mocks to simulate the PaymentGateway</li>
+                    <li>Test various scenarios including successful payments, failed payments, and error handling</li>
+                    <li>Implement both MiniTest and RSpec versions of your tests</li>
+                </ol>
+            </div>
+            
+            <div class="slide-controls">
+                <button class="btn prev-btn">← Previous: Testing with RSpec</button>
+                <button class="btn">Complete Chapter ✓</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Learn Ruby Interactive Course</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 11: Database Integration - Ruby Bootcamp</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Chapter 11: Database Integration</h1>
+        <p>Master database operations and ORM patterns in Ruby</p>
+    </header>
+    
+    <main class="container">
+        <div class="chapter-navigation">
+            <a href="index.html" class="btn">← Back to Course Index</a>
+            <a href="chapter12.html" class="btn">Next Chapter →</a>
+        </div>
+
+        <div class="slides-container">
+            <div class="slide active" id="slide-1">
+                <h2>Introduction to Databases in Ruby</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>Ruby offers various ways to interact with databases, from raw SQL to high-level Object-Relational Mapping (ORM) frameworks.</p>
+                        
+                        <h3>Types of Databases</h3>
+                        <ul>
+                            <li><strong>Relational Databases:</strong> SQLite, MySQL, PostgreSQL</li>
+                            <li><strong>NoSQL Databases:</strong> MongoDB, Redis, Cassandra</li>
+                            <li><strong>Key-Value Stores:</strong> Redis, Memcached</li>
+                            <li><strong>Document Stores:</strong> MongoDB, CouchDB</li>
+                        </ul>
+                        
+                        <h3>Ruby Database Access Options</h3>
+                        <ul>
+                            <li><strong>Direct SQL:</strong> Using database-specific gems (mysql2, pg, sqlite3)</li>
+                            <li><strong>Database Abstraction:</strong> Using Sequel or DataMapper</li>
+                            <li><strong>ORM Frameworks:</strong> ActiveRecord (Rails), Sequel::Model, ROM</li>
+                        </ul>
+                        
+                        <p>In this chapter, we'll focus on relational databases with both direct SQL and ActiveRecord ORM, as these are the most common in Ruby applications.</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide" disabled>Previous</button>
+                    <span class="slide-indicator">Slide 1 of 8</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-2">
+                <h2>SQL Fundamentals for Ruby Developers</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>Before diving into ORMs, it's essential to understand SQL fundamentals that underpin all relational database operations.</p>
+                        
+                        <h3>Basic SQL Operations</h3>
+                        <div class="code-example">
+                            <pre>-- Creating a table
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY,
+  name VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Inserting data
+INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com');
+
+-- Querying data
+SELECT * FROM users WHERE name = 'Alice';
+
+-- Updating data
+UPDATE users SET name = 'Alicia' WHERE email = 'alice@example.com';
+
+-- Deleting data
+DELETE FROM users WHERE id = 1;</pre>
+                        </div>
+                        
+                        <h3>Direct SQL in Ruby</h3>
+                        <div class="code-example">
+                            <pre>require 'sqlite3'
+
+# Open a database
+db = SQLite3::Database.new('my_database.db')
+db.results_as_hash = true
+
+# Execute a query
+users = db.execute("SELECT * FROM users WHERE name LIKE ?", "%Alice%")
+
+# Process results
+users.each do |user|
+  puts "#{user['id']}: #{user['name']} (#{user['email']})"
+end</pre>
+                        </div>
+                        
+                        <p>While direct SQL gives you full control, it can become cumbersome for complex applications. This is where ORMs come in.</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 2 of 8</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-3">
+                <h2>ActiveRecord ORM Framework</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>ActiveRecord is Ruby's most popular ORM, part of Ruby on Rails but usable independently as well. It implements the Active Record pattern, mapping database tables to classes and rows to objects.</p>
+                        
+                        <h3>Setting Up ActiveRecord</h3>
+                        <div class="code-example">
+                            <pre>require 'active_record'
+
+# Database connection
+ActiveRecord::Base.establish_connection(
+  adapter: 'sqlite3',
+  database: 'my_database.db'
+)
+
+# Define a model
+class User < ActiveRecord::Base
+  validates :email, presence: true, uniqueness: true
+  validates :name, presence: true
+end</pre>
+                        </div>
+                        
+                        <h3>Basic CRUD Operations</h3>
+                        <div class="code-example">
+                            <pre># Create
+user = User.create(name: 'Bob', email: 'bob@example.com')
+
+# Read
+bob = User.find_by(email: 'bob@example.com')
+all_users = User.all
+active_users = User.where(active: true)
+
+# Update
+bob.update(name: 'Robert')
+
+# Delete
+bob.destroy</pre>
+                        </div>
+                        
+                        <p>ActiveRecord handles SQL generation, data type conversions, and provides a rich API for querying and manipulating data.</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 3 of 8</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-4">
+                <h2>Database Migrations & Schema Management</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>Migrations provide a way to evolve your database schema over time in a structured and repeatable way.</p>
+                        
+                        <h3>Creating Migrations</h3>
+                        <div class="code-example">
+                            <pre>require 'active_record'
+
+class CreateUsers < ActiveRecord::Migration[7.0]
+  def change
+    create_table :users do |t|
+      t.string :name, null: false
+      t.string :email, null: false
+      t.boolean :active, default: true
+      t.timestamps
+    end
+    
+    add_index :users, :email, unique: true
+  end
+end
+
+# Run the migration
+CreateUsers.migrate(:up)</pre>
+                        </div>
+                        
+                        <h3>Altering Tables</h3>
+                        <div class="code-example">
+                            <pre>class AddProfileToUsers < ActiveRecord::Migration[7.0]
+  def change
+    add_column :users, :bio, :text
+    add_column :users, :birth_date, :date
+    
+    # Creating a join table
+    create_join_table :users, :roles do |t|
+      t.index [:user_id, :role_id]
+    end
+  end
+end</pre>
+                        </div>
+                        
+                        <p>Migrations make it easy to collaborate with other developers and manage database changes in version control.</p>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 4 of 8</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-5">
+                <h2>Complex Queries & Associations</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <h3>Defining Associations</h3>
+                        <div class="code-example">
+                            <pre>class User < ActiveRecord::Base
+  has_many :posts
+  has_many :comments
+  has_and_belongs_to_many :roles
+  has_one :profile
+end
+
+class Post < ActiveRecord::Base
+  belongs_to :user
+  has_many :comments
+  has_many :tags, through: :post_tags
+end
+
+class Comment < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :post
+end</pre>
+                        </div>
+                        
+                        <h3>Advanced Querying</h3>
+                        <div class="code-example">
+                            <pre># Eager loading to avoid N+1 query problems
+users = User.includes(:posts, :comments).where(active: true)
+
+# Complex conditions
+recent_active_posts = Post.where(
+  'created_at > ? AND status = ?', 
+  1.week.ago, 
+  'published'
+).order(created_at: :desc)
+
+# Joins and aggregations
+popular_users = User.joins(:posts)
+  .select('users.*, COUNT(posts.id) as post_count')
+  .group('users.id')
+  .having('post_count > 5')
+  .order('post_count DESC')
+
+# Raw SQL when needed
+User.find_by_sql(
+  "SELECT u.*, COUNT(c.id) AS comment_count 
+   FROM users u 
+   LEFT JOIN comments c ON u.id = c.user_id 
+   GROUP BY u.id"
+)</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 5 of 8</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-6">
+                <h2>Performance Optimization & Indexing</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>As your application grows, database performance becomes crucial. Here are key optimization techniques:</p>
+                        
+                        <h3>Database Indexing</h3>
+                        <div class="code-example">
+                            <pre>class AddIndexesToPosts < ActiveRecord::Migration[7.0]
+  def change
+    # Single-column index
+    add_index :posts, :status
+    
+    # Multi-column index
+    add_index :posts, [:user_id, :created_at]
+    
+    # Partial index
+    add_index :posts, :slug, unique: true, where: "status = 'published'"
+  end
+end</pre>
+                        </div>
+                        
+                        <h3>Query Optimization</h3>
+                        <ul>
+                            <li><strong>Use Eager Loading:</strong> <code>includes</code>, <code>preload</code>, and <code>eager_load</code> to avoid N+1 queries</li>
+                            <li><strong>Batch Processing:</strong> <code>find_each</code> and <code>find_in_batches</code> for large datasets</li>
+                            <li><strong>Use Pluck:</strong> <code>pluck</code> to select only the columns you need</li>
+                            <li><strong>Pagination:</strong> Limit results to manageable chunks</li>
+                        </ul>
+                        
+                        <div class="code-example">
+                            <pre># Processing large datasets in batches
+User.where(active: true).find_each(batch_size: 100) do |user|
+  # Process user
+end
+
+# Selecting only what you need
+emails = User.where(active: true).pluck(:email)
+
+# Using explain to analyze query performance
+User.where(email: 'test@example.com').explain</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 6 of 8</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-7">
+                <h2>NoSQL Options with Ruby</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>While relational databases work for most applications, sometimes NoSQL solutions are more appropriate for specific use cases.</p>
+                        
+                        <h3>MongoDB with Mongoid</h3>
+                        <div class="code-example">
+                            <pre>require 'mongoid'
+
+Mongoid.configure do |config|
+  config.clients.default = {
+    uri: 'mongodb://localhost:27017/my_app'
+  }
+end
+
+class User
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  
+  field :name, type: String
+  field :email, type: String
+  field :active, type: Boolean, default: true
+  field :profile, type: Hash
+  
+  has_many :posts
+  
+  validates :email, presence: true, uniqueness: true
+end
+
+# Creating a document
+user = User.create(
+  name: 'Alice',
+  email: 'alice@example.com',
+  profile: {
+    bio: 'Ruby developer',
+    location: 'New York',
+    skills: ['Ruby', 'Rails', 'MongoDB']
+  }
+)
+
+# Querying
+User.where(:profile.exists => true)
+User.where(:name => /^A/)
+User.where(:profile.matches => { location: 'New York' })</pre>
+                        </div>
+                        
+                        <h3>Redis for Caching and Key-Value Storage</h3>
+                        <div class="code-example">
+                            <pre>require 'redis'
+
+redis = Redis.new(url: 'redis://localhost:6379/0')
+
+# Basic operations
+redis.set('user:1:name', 'Alice')
+name = redis.get('user:1:name')
+
+# Lists
+redis.lpush('recent_users', 'user:1')
+redis.lrange('recent_users', 0, -1)
+
+# Sets
+redis.sadd('active_users', 'user:1', 'user:2')
+redis.smembers('active_users')
+
+# Hashes
+redis.hset('user:1', 'name', 'Alice', 'email', 'alice@example.com')
+redis.hgetall('user:1')</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 7 of 8</span>
+                    <button class="btn next-slide">Next</button>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-8">
+                <h2>Database Security Best Practices</h2>
+                <div class="slide-content">
+                    <div class="text-content">
+                        <p>Securing your database is critical to protecting user data and preventing security breaches.</p>
+                        
+                        <h3>Preventing SQL Injection</h3>
+                        <div class="code-example">
+                            <pre># BAD - Direct string interpolation
+User.where("name = '#{user_input}'")  # VULNERABLE
+
+# GOOD - Parameterized queries
+User.where("name = ?", user_input)    # SAFE
+
+# GOOD - Hash conditions (automatically parameterized)
+User.where(name: user_input)          # SAFE</pre>
+                        </div>
+                        
+                        <h3>Data Encryption</h3>
+                        <div class="code-example">
+                            <pre>require 'active_record/encryption'
+
+# Configure encryption
+ActiveRecord::Encryption.configure(
+  primary_key: ENV['DB_ENCRYPTION_PRIMARY_KEY'],
+  deterministic_key: ENV['DB_ENCRYPTION_DETERMINISTIC_KEY'],
+  key_derivation_salt: ENV['DB_ENCRYPTION_KEY_DERIVATION_SALT']
+)
+
+class User < ActiveRecord::Base
+  # Encrypting sensitive data
+  encrypts :social_security_number
+  
+  # Searchable encrypted attributes
+  encrypts :email, deterministic: true
+end</pre>
+                        </div>
+                        
+                        <h3>Additional Security Measures</h3>
+                        <ul>
+                            <li>Use strong, unique database credentials</li>
+                            <li>Implement proper access controls and user privileges</li>
+                            <li>Regularly back up your database</li>
+                            <li>Keep your database software updated</li>
+                            <li>Use a Web Application Firewall (WAF)</li>
+                            <li>Audit and log database access</li>
+                            <li>Implement proper error handling to prevent information leakage</li>
+                        </ul>
+                        
+                        <div class="mini-project">
+                            <h4>Mini Project: ActiveRecord CRUD Application</h4>
+                            <p>Build a simple task management application with the following requirements:</p>
+                            <ol>
+                                <li>Create a database with tables for users, projects, and tasks</li>
+                                <li>Implement ActiveRecord models with appropriate associations</li>
+                                <li>Add validations for data integrity</li>
+                                <li>Create migration files for all schema changes</li>
+                                <li>Implement CRUD operations for all models</li>
+                                <li>Add at least one complex query using joins</li>
+                                <li>Implement proper error handling and security measures</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="cta-container">
+                            <a href="#" class="btn complete-chapter">Complete Chapter</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide-navigation">
+                    <button class="btn prev-slide">Previous</button>
+                    <span class="slide-indicator">Slide 8 of 8</span>
+                    <button class="btn next-slide" disabled>Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Ruby Bootcamp</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
