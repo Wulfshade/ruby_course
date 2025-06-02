@@ -824,67 +824,45 @@ puts today.month  # => 5</pre>
             </div>
             
             <div class="mini-project">
-                <h4>Mini Project: Logging System</h4>
+                <h4>Mini Project: D&D Spellcasters</h4>
                 <p>Create a Ruby program that:</p>
                 <ol>
-                    <li>Defines a <code>Loggable</code> module with methods for:
-                        <ul>
-                            <li>Logging info, warning, and error messages</li>
-                            <li>Timestamping log entries</li>
-                            <li>Formatting log messages</li>
-                        </ul>
-                    </li>
-                    <li>Creates different logger classes for different outputs:
-                        <ul>
-                            <li><code>ConsoleLogger</code> - logs to the console</li>
-                            <li><code>FileLogger</code> - logs to a file</li>
-                        </ul>
-                    </li>
-                    <li>Demonstrates how different classes can include and use the same module</li>
+                    <li>Defines a <code>Spellcasting</code> module with a <code>cast_spell</code> method that prints the character's name and the spell being cast.</li>
+                    <li>Creates two classes, <code>Wizard</code> and <code>Bard</code>, that each include the <code>Spellcasting</code> module and have a <code>name</code> attribute.</li>
+                    <li>Demonstrates both classes casting different spells using the mixin.</li>
                 </ol>
-                <button type="button" class="btn solution-btn" onclick="toggleSolution('logging-system', event)">Show Solution</button>
-                <div id="logging-system" class="solution-content" style="display: none;">
+                <button type="button" class="btn solution-btn" onclick="toggleSolution('spellcasters-dnd', event)">Show Solution</button>
+                <div id="spellcasters-dnd" class="solution-content" style="display: none;">
                     <h5>Solution:</h5>
-                    <pre><code class="language-ruby"># Chapter 5: Mini Project - Logging System
+                    <pre><code class="language-ruby"># Chapter 5: Mini Project - D&D Spellcasters
+module Spellcasting
+  def cast_spell(spell)
+    puts "#{name} casts #{spell}!"
+  end
+end
 
-# Loggable module that can be included in any class that needs logging capability
-module Loggable
-  # Log levels
-  LOG_LEVELS = {
-    debug: 0,
-    info: 1,
-    warning: 2,
-    error: 3,
-    fatal: 4
-  }
-  
-  # Set a default minimum log level (can be overridden)
-  def self.included(base)
-    base.class_eval do
-      attr_accessor :min_log_level
-    end
+class Wizard
+  include Spellcasting
+  attr_reader :name
+  def initialize(name)
+    @name = name
   end
-  
-  # Format a log message with timestamp and level
-  def format_log_message(level, message)
-    timestamp = Time.now.strftime("%Y-%m-%d %H:%M:%S")
-    "[#{timestamp}] [#{level.to_s.upcase}] #{message}"
+end
+
+class Bard
+  include Spellcasting
+  attr_reader :name
+  def initialize(name)
+    @name = name
   end
-  
-  # Methods for different log levels
-  def debug(message)
-    log(:debug, message) if should_log?(:debug)
-  end
-  
-  def info(message)
-    log(:info, message) if should_log?(:info)
-  end
-  
-  def warning(message)
-    log(:warning, message) if should_log?(:warning)
-  end
-  
-  def error(message)
+end
+
+wizard = Wizard.new("Gandalf")
+bard = Bard.new("Jaskier")
+
+wizard.cast_spell("Fireball")      # Gandalf casts Fireball!
+bard.cast_spell("Song of Rest")    # Jaskier casts Song of Rest!
+
     log(:error, message) if should_log?(:error)
   end
   
